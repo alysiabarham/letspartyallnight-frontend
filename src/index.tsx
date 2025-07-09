@@ -1,31 +1,24 @@
 // src/index.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App'; // We'll rename LandingPage to App, or create a new App component
+import './index.css'; // Keep this if you have it
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { ChakraProvider } from '@chakra-ui/react';
-import { extendTheme } from '@chakra-ui/react';
+// REMOVE 'import { extendTheme } from '@chakra-ui/react';' from here if it's separate
 
 // Import BrowserRouter
 import { BrowserRouter as Router } from 'react-router-dom';
 
-
-const theme = extendTheme({
-  colors: {
-    brand: {
-      500: '#8A2BE2', // Example purple color
-    },
-  },
-});
+import theme from './theme'; // <--- IMPORTANT: This line imports your custom theme
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme}> {/* <--- Ensure theme={theme} is applied here */}
       {/* Wrap your App (which will contain routes) with Router */}
       <Router>
         <App />
@@ -34,4 +27,4 @@ root.render(
   </React.StrictMode>
 );
 
-reportWebVitals();
+reportWebVitals(); // Keep this line if you want web vitals reporting
