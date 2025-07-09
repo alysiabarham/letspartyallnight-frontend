@@ -9,14 +9,14 @@ import RoomPage from './RoomPage'; // Import the RoomPage component
 // Define your LandingPageContent component
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
-  const [playerNameInput, setPlayerNameInput] = useState(''); // <--- NEW STATE FOR PLAYER NAME
+  const [playerNameInput, setPlayerNameInput] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
 
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   const handleCreateRoom = async () => {
-    if (!playerNameInput.trim()) { // <--- VALIDATION FOR PLAYER NAME
+    if (!playerNameInput.trim()) {
       toast({
         title: "Please enter your name.",
         status: "warning",
@@ -27,7 +27,6 @@ const LandingPageContent = () => {
     }
 
     try {
-      // Use the entered player name as hostId for now
       const hostId = playerNameInput.trim(); 
       
       const response = await axios.post(`${BACKEND_URL}/create-room`, { hostId: hostId });
@@ -41,7 +40,6 @@ const LandingPageContent = () => {
         isClosable: true,
       });
 
-      // Pass the player name to the room page via state (for immediate display)
       navigate(`/room/${roomCode}`, { state: { playerName: playerNameInput.trim() } });
 
     } catch (error: any) {
@@ -57,7 +55,7 @@ const LandingPageContent = () => {
   };
 
   const handleJoinRoom = async () => {
-    if (!roomCodeInput.trim() || !playerNameInput.trim()) { // <--- VALIDATION FOR BOTH
+    if (!roomCodeInput.trim() || !playerNameInput.trim()) {
       toast({
         title: "Please enter your name and a room code.",
         status: "warning",
@@ -68,7 +66,6 @@ const LandingPageContent = () => {
     }
 
     try {
-      // Use the entered player name as playerId
       const playerId = playerNameInput.trim(); 
       
       const response = await axios.post(`${BACKEND_URL}/join-room`, {
@@ -86,7 +83,6 @@ const LandingPageContent = () => {
         isClosable: true,
       });
 
-      // Pass the player name to the room page via state
       navigate(`/room/${room.code}`, { state: { playerName: playerNameInput.trim() } });
 
     } catch (error: any) {
@@ -102,7 +98,8 @@ const LandingPageContent = () => {
   };
 
   return (
-    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black">
+    // Changed background to a dark purple/blue matching the original screenshot
+    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E"> 
       <Heading as="h1" size="2xl" color="brand.500">
         Let's Party All Night!
       </Heading>
@@ -110,7 +107,6 @@ const LandingPageContent = () => {
         Host or join a game with friends.
       </Text>
 
-      {/* --- NEW PLAYER NAME INPUT --- */}
       <Input
         placeholder="Enter Your Name"
         size="lg"
@@ -118,12 +114,12 @@ const LandingPageContent = () => {
         onChange={(e) => setPlayerNameInput(e.target.value)}
         w="300px"
         textAlign="center"
+        // Input styling (color and border) now comes from theme.ts baseStyle
       />
-      {/* --- END NEW PLAYER NAME INPUT --- */}
 
       <Button
-        colorScheme="brand"
-        variant="neon"
+        colorScheme="brand" // Still uses 'brand' palette
+        variant="neon"      // <--- Keep neon for magenta button
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -142,10 +138,11 @@ const LandingPageContent = () => {
         onChange={(e) => setRoomCodeInput(e.target.value)}
         w="300px"
         textAlign="center"
+        // Input styling (color and border) now comes from theme.ts baseStyle
       />
       <Button
-        colorScheme="teal"
-        variant="neon"
+        colorScheme="teal" // Can keep teal or change to 'brand' if you prefer
+        variant="neonGreen" // <--- Apply the new 'neonGreen' variant for Join button
         size="lg"
         onClick={handleJoinRoom}
         w="200px"
