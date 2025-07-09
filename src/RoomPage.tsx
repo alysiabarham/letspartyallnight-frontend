@@ -1,19 +1,18 @@
 // src/RoomPage.tsx
 import { Box, Heading, Text, VStack, Spinner } from '@chakra-ui/react';
-import { useParams, useLocation } from 'react-router-dom'; // Import useLocation
-import { useEffect, useState } from 'react'; // Import useEffect and useState
-import axios from 'axios'; // Import axios
+import { useParams, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const RoomPage = () => {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const location = useLocation(); // Hook to access state passed during navigation
-  const initialPlayerName = (location.state as { playerName?: string })?.playerName || 'You'; // Get player name
+  const location = useLocation();
+  const initialPlayerName = (location.state as { playerName?: string })?.playerName || 'You';
 
-  const [players, setPlayers] = useState([{ id: 'loading', name: initialPlayerName }]); // State to hold players
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [players, setPlayers] = useState([{ id: 'loading', name: initialPlayerName }]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // IMPORTANT: Replace with your actual deployed backend URL
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   useEffect(() => {
@@ -26,7 +25,7 @@ const RoomPage = () => {
       } catch (err: any) {
         console.error("Error fetching room details:", err.response?.data || err.message);
         setError(err.response?.data?.error || "Failed to load room details.");
-        setPlayers([]); // Clear players on error
+        setPlayers([]);
       } finally {
         setLoading(false);
       }
@@ -35,21 +34,24 @@ const RoomPage = () => {
     if (roomCode) {
       fetchRoomDetails();
     }
-  }, [roomCode]); // Re-fetch if roomCode changes
+  }, [roomCode]);
 
   return (
-    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black"> {/* Changed background to black */}
-      <Heading as="h1" size="xl" color="brand.500">
+    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black"> {/* Keep background black for contrast */}
+      <Heading as="h1" size="xl" color="brand.primaryBlueNeon"> {/* <--- Use primaryBlueNeon for room code heading */}
         Welcome to Room: {roomCode}
       </Heading>
-      <Text fontSize="lg" color="white"> {/* Changed text color to white */}
+      <Text fontSize="lg" color="white">
         This is your game lobby. Players will appear here.
       </Text>
 
-      <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.900" borderColor="brand.500" w="300px" textAlign="left" boxShadow="0 0 10px #FF00FF"> {/* Darker box with neon border */}
-        <Text fontWeight="bold" mb={2} color="brand.500">Players:</Text>
+      <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.900" 
+           borderColor="brand.primaryBlueNeon" // <--- Use primaryBlueNeon for box border
+           w="300px" textAlign="left" 
+           boxShadow="0 0 10px #00BFFF"> {/* <--- Use primaryBlueNeon for box shadow */}
+        <Text fontWeight="bold" mb={2} color="brand.primaryBlueNeon">Players:</Text> {/* <--- Use primaryBlueNeon for Players text */}
         {loading ? (
-          <Spinner size="md" color="brand.500" />
+          <Spinner size="md" color="brand.primaryBlueNeon" /> {/* <--- Use primaryBlueNeon for spinner */}
         ) : error ? (
           <Text color="red.500">{error}</Text>
         ) : players.length > 0 ? (

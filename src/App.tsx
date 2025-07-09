@@ -98,9 +98,8 @@ const LandingPageContent = () => {
   };
 
   return (
-    // Changed background to a dark purple/blue matching the original screenshot
     <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E"> 
-      <Heading as="h1" size="2xl" color="brand.500">
+      <Heading as="h1" size="2xl" color="brand.500"> {/* Keep magenta for main title */}
         Let's Party All Night!
       </Heading>
       <Text fontSize="lg" color="white">
@@ -114,12 +113,12 @@ const LandingPageContent = () => {
         onChange={(e) => setPlayerNameInput(e.target.value)}
         w="300px"
         textAlign="center"
-        // Input styling (color and border) now comes from theme.ts baseStyle
+        // Input styling (color, border, placeholder) now comes from theme.ts baseStyle
       />
 
       <Button
-        colorScheme="brand" // Still uses 'brand' palette
-        variant="neon"      // <--- Keep neon for magenta button
+        colorScheme="brand"
+        variant="primaryNeonBlue"      {/* <--- Use primary blue neon for Create button */}
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -138,11 +137,11 @@ const LandingPageContent = () => {
         onChange={(e) => setRoomCodeInput(e.target.value)}
         w="300px"
         textAlign="center"
-        // Input styling (color and border) now comes from theme.ts baseStyle
+        // Input styling (color, border, placeholder) now comes from theme.ts baseStyle
       />
       <Button
         colorScheme="teal" // Can keep teal or change to 'brand' if you prefer
-        variant="neonGreen" // <--- Apply the new 'neonGreen' variant for Join button
+        variant="neonGreen"      {/* <--- Keep neonGreen for Join button */}
         size="lg"
         onClick={handleJoinRoom}
         w="200px"
