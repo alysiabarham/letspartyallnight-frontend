@@ -4,18 +4,21 @@ import { Box, Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 
-import RoomPage from './RoomPage'; // <--- KEEP this import. This is your separate RoomPage.tsx
+import RoomPage from './RoomPage'; // Import the RoomPage component
 
-// Define your LandingPageContent component directly here
+// Define your LandingPageContent component
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
 
-  const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app/'; // Your local backend URL
+  // IMPORTANT: Replace this with your actual deployed backend URL from Vercel
+  const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
+  // Make sure there is NO trailing slash here, as we add it in the axios calls
 
   const handleCreateRoom = async () => {
     try {
+      // In a real app, you'd get a proper playerId from authentication
       const playerId = `player_${Math.random().toString(36).substring(2, 7)}`;
       
       const response = await axios.post(`${BACKEND_URL}/create-room`, { hostId: playerId });
@@ -29,13 +32,14 @@ const LandingPageContent = () => {
         isClosable: true,
       });
 
+      // Navigate to the new room URL
       navigate(`/room/${roomCode}`);
 
     } catch (error) {
       console.error("Error creating room:", error);
       toast({
         title: "Error creating room.",
-        description: "Please try again later.",
+        description: "Please try again later. Check backend logs for details.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -87,16 +91,18 @@ const LandingPageContent = () => {
   };
 
   return (
-    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="gray.50">
+    // Set background to black and center content vertically
+    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black">
       <Heading as="h1" size="2xl" color="brand.500">
         Let's Party All Night!
       </Heading>
-      <Text fontSize="lg" color="gray.600">
+      <Text fontSize="lg" color="white"> {/* Changed text color to white */}
         Host or join a game with friends.
       </Text>
 
       <Button
-        colorScheme="brand"
+        colorScheme="brand" // Uses the 'brand' color palette
+        variant="neon"      // <--- Apply the custom 'neon' variant
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -104,7 +110,7 @@ const LandingPageContent = () => {
         CREATE NEW ROOM
       </Button>
 
-      <Text fontSize="lg" color="gray.600">
+      <Text fontSize="lg" color="white"> {/* Changed text color to white */}
         OR
       </Text>
 
@@ -115,9 +121,11 @@ const LandingPageContent = () => {
         onChange={(e) => setRoomCodeInput(e.target.value)}
         w="300px"
         textAlign="center"
+        // Input styling comes from theme.ts baseStyle
       />
       <Button
-        colorScheme="teal"
+        colorScheme="teal" // Uses the 'teal' color palette
+        variant="neon"      // <--- Apply the custom 'neon' variant
         size="lg"
         onClick={handleJoinRoom}
         w="200px"
@@ -134,7 +142,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPageContent />} />
-      {/* RoomPage is now imported from its own file, so we just use the component name directly */}
       <Route path="/room/:roomCode" element={<RoomPage />} />
     </Routes>
   );
