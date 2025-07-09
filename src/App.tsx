@@ -9,19 +9,28 @@ import RoomPage from './RoomPage'; // Import the RoomPage component
 // Define your LandingPageContent component
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
+  const [playerNameInput, setPlayerNameInput] = useState(''); // <--- NEW STATE FOR PLAYER NAME
   const toast = useToast();
   const navigate = useNavigate();
 
-  // IMPORTANT: Replace this with your actual deployed backend URL from Vercel
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
-  // Make sure there is NO trailing slash here, as we add it in the axios calls
 
   const handleCreateRoom = async () => {
+    if (!playerNameInput.trim()) { // <--- VALIDATION FOR PLAYER NAME
+      toast({
+        title: "Please enter your name.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
-      // In a real app, you'd get a proper playerId from authentication
-      const playerId = `player_${Math.random().toString(36).substring(2, 7)}`;
+      // Use the entered player name as hostId for now
+      const hostId = playerNameInput.trim(); 
       
-      const response = await axios.post(`${BACKEND_URL}/create-room`, { hostId: playerId });
+      const response = await axios.post(`${BACKEND_URL}/create-room`, { hostId: hostId });
       const { roomCode, room } = response.data;
       
       toast({
@@ -32,14 +41,14 @@ const LandingPageContent = () => {
         isClosable: true,
       });
 
-      // Navigate to the new room URL
-      navigate(`/room/${roomCode}`);
+      // Pass the player name to the room page via state (for immediate display)
+      navigate(`/room/${roomCode}`, { state: { playerName: playerNameInput.trim() } });
 
-    } catch (error) {
-      console.error("Error creating room:", error);
+    } catch (error: any) {
+      console.error("Error creating room:", error.response?.data || error.message);
       toast({
         title: "Error creating room.",
-        description: "Please try again later. Check backend logs for details.",
+        description: error.response?.data?.error || "Please try again later. Check backend logs for details.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -48,9 +57,9 @@ const LandingPageContent = () => {
   };
 
   const handleJoinRoom = async () => {
-    if (!roomCodeInput) {
+    if (!roomCodeInput.trim() || !playerNameInput.trim()) { // <--- VALIDATION FOR BOTH
       toast({
-        title: "Please enter a room code.",
+        title: "Please enter your name and a room code.",
         status: "warning",
         duration: 3000,
         isClosable: true,
@@ -59,7 +68,8 @@ const LandingPageContent = () => {
     }
 
     try {
-      const playerId = `player_${Math.random().toString(36).substring(2, 7)}`;
+      // Use the entered player name as playerId
+      const playerId = playerNameInput.trim(); 
       
       const response = await axios.post(`${BACKEND_URL}/join-room`, {
         roomCode: roomCodeInput,
@@ -76,7 +86,8 @@ const LandingPageContent = () => {
         isClosable: true,
       });
 
-      navigate(`/room/${room.code}`);
+      // Pass the player name to the room page via state
+      navigate(`/room/${room.code}`, { state: { playerName: playerNameInput.trim() } });
 
     } catch (error: any) {
       console.error("Error joining room:", error.response?.data || error.message);
@@ -91,18 +102,28 @@ const LandingPageContent = () => {
   };
 
   return (
-    // Set background to black and center content vertically
     <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black">
       <Heading as="h1" size="2xl" color="brand.500">
         Let's Party All Night!
       </Heading>
-      <Text fontSize="lg" color="white"> {/* Changed text color to white */}
+      <Text fontSize="lg" color="white">
         Host or join a game with friends.
       </Text>
 
+      {/* --- NEW PLAYER NAME INPUT --- */}
+      <Input
+        placeholder="Enter Your Name"
+        size="lg"
+        value={playerNameInput}
+        onChange={(e) => setPlayerNameInput(e.target.value)}
+        w="300px"
+        textAlign="center"
+      />
+      {/* --- END NEW PLAYER NAME INPUT --- */}
+
       <Button
-        colorScheme="brand" // Uses the 'brand' color palette
-        variant="neon"      // <--- Apply the custom 'neon' variant
+        colorScheme="brand"
+        variant="neon"
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -110,7 +131,7 @@ const LandingPageContent = () => {
         CREATE NEW ROOM
       </Button>
 
-      <Text fontSize="lg" color="white"> {/* Changed text color to white */}
+      <Text fontSize="lg" color="white">
         OR
       </Text>
 
@@ -121,11 +142,10 @@ const LandingPageContent = () => {
         onChange={(e) => setRoomCodeInput(e.target.value)}
         w="300px"
         textAlign="center"
-        // Input styling comes from theme.ts baseStyle
       />
       <Button
-        colorScheme="teal" // Uses the 'teal' color palette
-        variant="neon"      // <--- Apply the custom 'neon' variant
+        colorScheme="teal"
+        variant="neon"
         size="lg"
         onClick={handleJoinRoom}
         w="200px"
