@@ -37,8 +37,8 @@ const RoomPage = () => {
   }, [roomCode]);
 
   return (
-    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black"> {/* Keep background black for contrast */}
-      <Heading as="h1" size="xl" color="brand.primaryBlueNeon"> {/* <--- Use primaryBlueNeon for room code heading */}
+    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black">
+      <Heading as="h1" size="xl" color="brand.primaryBlueNeon"> {/* Room code heading is primary blue neon */}
         Welcome to Room: {roomCode}
       </Heading>
       <Text fontSize="lg" color="white">
@@ -46,12 +46,12 @@ const RoomPage = () => {
       </Text>
 
       <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.900" 
-           borderColor="brand.primaryBlueNeon" // <--- Use primaryBlueNeon for box border
+           borderColor="brand.primaryBlueNeon" // Box border is primary blue neon
            w="300px" textAlign="left" 
-           boxShadow="0 0 10px #00BFFF"> {/* <--- Use primaryBlueNeon for box shadow */}
-        <Text fontWeight="bold" mb={2} color="brand.primaryBlueNeon">Players:</Text> {/* <--- Use primaryBlueNeon for Players text */}
+           boxShadow="0 0 10px #00BFFF"> {/* Box shadow is primary blue neon */}
+        <Text fontWeight="bold" mb={2} color="brand.primaryBlueNeon">Players:</Text> {/* Players text is primary blue neon */}
         {loading ? (
-          <Spinner size="md" color="brand.primaryBlueNeon" /> {/* <--- Use primaryBlueNeon for spinner */}
+          <Spinner size="md" color="brand.primaryBlueNeon" /> {/* Spinner is primary blue neon */}
         ) : error ? (
           <Text color="red.500">{error}</Text>
         ) : players.length > 0 ? (

@@ -13,6 +13,7 @@ const LandingPageContent = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
+  // Your backend URL (this will be updated in server.js for CORS)
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   const handleCreateRoom = async () => {
@@ -99,7 +100,7 @@ const LandingPageContent = () => {
 
   return (
     <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E"> 
-      <Heading as="h1" size="2xl" color="brand.500"> {/* Keep magenta for main title */}
+      <Heading as="h1" size="2xl" color="brand.500"> {/* Main title remains magenta */}
         Let's Party All Night!
       </Heading>
       <Text fontSize="lg" color="white">
@@ -118,7 +119,7 @@ const LandingPageContent = () => {
 
       <Button
         colorScheme="brand"
-        variant="primaryNeonBlue"      {/* <--- Use primary blue neon for Create button */}
+        variant="neon"      {/* CREATE NEW ROOM button uses default neon (magenta) */}
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -140,8 +141,8 @@ const LandingPageContent = () => {
         // Input styling (color, border, placeholder) now comes from theme.ts baseStyle
       />
       <Button
-        colorScheme="teal" // Can keep teal or change to 'brand' if you prefer
-        variant="neonGreen"      {/* <--- Keep neonGreen for Join button */}
+        colorScheme="brand" // Use 'brand' color scheme
+        variant="primaryNeonBlue"      {/* JOIN ROOM button uses primary blue neon */}
         size="lg"
         onClick={handleJoinRoom}
         w="200px"

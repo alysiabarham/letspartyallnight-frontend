@@ -9,40 +9,39 @@ const theme = extendTheme({
       200: '#ADD8E6', // LightBlue
       300: '#87CEEB', // SkyBlue
       400: '#6495ED', // CornflowerBlue
-      500: '#FF00FF', // Neon Magenta (primary for title, create button)
+      500: '#FF00FF', // Neon Magenta (primary for main title)
       600: '#FF00CC', // Slightly darker magenta
       700: '#CC0099', // Even darker magenta
       800: '#990066', // Dark Magenta
       900: '#660033', // Very Dark Magenta
 
-      blueNeon: '#00FFFF',  // Cyan/Aqua (used for join button)
-      greenNeon: '#00FF00', // Lime Green (used for join button)
+      // Keeping these defined but will avoid using them for buttons/borders
+      blueNeon: '#00FFFF',  // Cyan/Aqua
+      greenNeon: '#00FF00', // Lime Green
 
-      // --- NEW: Primary Blue Neon ---
-      primaryBlueNeon: '#00BFFF', // Deep Sky Blue - a vibrant blue neon
-      // --- ---------------------- ---
-
-      neonYellow: '#FFFF00', // <--- NEW: Neon Yellow for input text
+      primaryBlueNeon: '#00BFFF', // Your favorite vibrant blue neon
+      neonYellow: '#FFFF00',       // Neon Yellow for input text
     },
     glow: {
       pink: '#FF00FF',
       blue: '#00FFFF',
       green: '#00FF00',
-      primaryBlue: '#00BFFF', // Add primary blue to glow
-      yellow: '#FFFF00', // Add yellow to glow
+      primaryBlue: '#00BFFF',
+      yellow: '#FFFF00',
     }
   },
   components: {
     Heading: {
       baseStyle: {
-        // Keep magenta for the main title, or change to primaryBlueNeon if preferred
+        // Main title remains magenta, RoomPage heading will be primaryBlueNeon
         textShadow: '0 0 5px #FF00FF, 0 0 10px #FF00FF, 0 0 15px #FF00FF, 0 0 20px #FF00FF, 0 0 25px #FF00FF, 0 0 30px #FF00FF, 0 0 35px #FF00FF',
       },
     },
     Button: {
       variants: {
-        neon: { // Magenta button (CREATE NEW ROOM)
-          bg: 'transparent', // Make background transparent like the others
+        // Default neon variant (magenta) - will be used for CREATE NEW ROOM button
+        neon: {
+          bg: 'transparent',
           color: 'brand.500',
           border: '2px solid',
           borderColor: 'brand.500',
@@ -52,29 +51,7 @@ const theme = extendTheme({
             boxShadow: '0 0 8px #FF00FF, 0 0 15px #FF00FF, 0 0 25px #FF00FF',
           },
         },
-        neonBlue: { // Cyan/Aqua button
-          bg: 'transparent',
-          color: 'brand.blueNeon',
-          border: '2px solid',
-          borderColor: 'brand.blueNeon',
-          boxShadow: '0 0 5px #00FFFF, 0 0 10px #00FFFF, 0 0 15px #00FFFF',
-          _hover: {
-            bg: 'rgba(0, 255, 255, 0.1)',
-            boxShadow: '0 0 8px #00FFFF, 0 0 15px #00FFFF, 0 0 25px #00FFFF',
-          },
-        },
-        neonGreen: { // Lime Green button (JOIN ROOM)
-          bg: 'transparent',
-          color: 'brand.greenNeon',
-          border: '2px solid',
-          borderColor: 'brand.greenNeon',
-          boxShadow: '0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00',
-          _hover: {
-            bg: 'rgba(0, 255, 0, 0.1)',
-            boxShadow: '0 0 8px #00FF00, 0 0 15px #00FF00, 0 0 25px #00FF00',
-          },
-        },
-        // --- NEW: Primary Blue Neon Button Variant ---
+        // Primary Blue Neon button variant - will be used for JOIN ROOM button
         primaryNeonBlue: {
           bg: 'transparent',
           color: 'brand.primaryBlueNeon',
@@ -86,20 +63,20 @@ const theme = extendTheme({
             boxShadow: '0 0 8px #00BFFF, 0 0 15px #00BFFF, 0 0 25px #00BFFF',
           },
         },
-        // --- ------------------------------------- ---
+        // Removed neonGreen variant to avoid blue-green mixture
       },
     },
     Input: {
         baseStyle: {
-            color: 'brand.neonYellow', // <--- Input text color is now neon yellow
-            borderColor: 'brand.primaryBlueNeon', // <--- Input border is now primary blue neon
+            color: 'brand.neonYellow',       // Input text color is now neon yellow
+            borderColor: 'brand.neonYellow', // Input border is now neon yellow
             _focus: {
-                borderColor: 'brand.primaryBlueNeon',
-                boxShadow: '0 0 5px #00BFFF',
+                borderColor: 'brand.neonYellow',
+                boxShadow: '0 0 5px #FFFF00', // Neon yellow glow on focus
             },
-            _placeholder: { // <--- Style for placeholder text
-                color: 'brand.neonYellow', // Placeholder also neon yellow
-                opacity: 0.7 // Make it slightly transparent
+            _placeholder: {
+                color: 'brand.neonYellow',   // Placeholder also neon yellow
+                opacity: 0.7
             }
         }
     }
