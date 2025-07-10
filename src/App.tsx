@@ -12,6 +12,7 @@ const LandingPageContent = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
+  // This is the direct Vercel URL for your backend project
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   const handleCreateRoom = async () => {
