@@ -4,25 +4,25 @@ import { extendTheme } from '@chakra-ui/react';
 const theme = extendTheme({
   colors: {
     brand: {
-      50: '#F0F8FF', // AliceBlue (very light)
-      100: '#E0FFFF', // Azure
-      200: '#ADD8E6', // LightBlue
-      300: '#87CEEB', // SkyBlue
-      400: '#6495ED', // CornflowerBlue
-      500: '#FF00FF', // Neon Magenta (primary for main title, CREATE NEW ROOM button)
-      600: '#FF00CC', // Slightly darker magenta
-      700: '#CC0099', // Even darker magenta
-      800: '#990066', // Dark Magenta
-      900: '#660033', // Very Dark Magenta
+      50: '#F0F8FF',
+      100: '#E0FFFF',
+      200: '#ADD8E6',
+      300: '#87CEEB',
+      400: '#6495ED',
+      500: '#FF00FF', // Neon Magenta (main title, CREATE NEW ROOM button)
+      600: '#FF00CC',
+      700: '#CC0099',
+      800: '#990066',
+      900: '#660033',
 
       primaryBlueNeon: '#00BFFF', // Your favorite vibrant blue neon
-      pureGreenNeon: '#00FF00',   // Pure Green Neon (for JOIN ROOM button)
+      pureGreenNeon: '#00FF00',   // Pure Green Neon (JOIN ROOM button)
       neonYellow: '#FFFF00',       // Neon Yellow for input text
     },
     glow: {
       pink: '#FF00FF',
       blue: '#00FFFF',
-      green: '#00FF00', // This is pure green
+      green: '#00FF00',
       primaryBlue: '#00BFFF',
       yellow: '#FFFF00',
     }
@@ -35,8 +35,7 @@ const theme = extendTheme({
     },
     Button: {
       variants: {
-        // CREATE NEW ROOM button (Magenta)
-        neon: {
+        neon: { // CREATE NEW ROOM button (Magenta)
           bg: 'transparent',
           color: 'brand.500',
           border: '2px solid',
@@ -47,8 +46,7 @@ const theme = extendTheme({
             boxShadow: '0 0 8px #FF00FF, 0 0 15px #FF00FF, 0 0 25px #FF00FF',
           },
         },
-        // JOIN ROOM button (Pure Green)
-        pureGreenNeon: {
+        pureGreenNeon: { // JOIN ROOM button (Pure Green)
           bg: 'transparent',
           color: 'brand.pureGreenNeon',
           border: '2px solid',

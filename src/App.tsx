@@ -4,16 +4,14 @@ import { Box, Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 
-import RoomPage from './RoomPage'; // Import the RoomPage component
+import RoomPage from './RoomPage';
 
-// Define your LandingPageContent component
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [playerNameInput, setPlayerNameInput] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
 
-  // This is the direct Vercel URL for your backend project
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   const handleCreateRoom = async () => {
@@ -100,7 +98,7 @@ const LandingPageContent = () => {
 
   return (
     <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E"> 
-      <Heading as="h1" size="2xl" color="brand.500"> {/* Main title remains magenta */}
+      <Heading as="h1" size="2xl" color="brand.500">
         Let's Party All Night!
       </Heading>
       <Text fontSize="lg" color="white">
@@ -118,7 +116,7 @@ const LandingPageContent = () => {
 
       <Button
         colorScheme="brand"
-        variant="neon"      /* CREATE NEW ROOM button uses default neon (magenta) */
+        variant="neon"
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -140,7 +138,7 @@ const LandingPageContent = () => {
       />
       <Button
         colorScheme="brand" 
-        variant="pureGreenNeon"      /* JOIN ROOM button uses pure green neon */
+        variant="pureGreenNeon"
         size="lg"
         onClick={handleJoinRoom}
         w="200px"
@@ -152,7 +150,6 @@ const LandingPageContent = () => {
 };
 
 
-// This is the main App component that sets up routing
 function App() {
   return (
     <Routes>

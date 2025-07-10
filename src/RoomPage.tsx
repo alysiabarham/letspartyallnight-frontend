@@ -13,7 +13,6 @@ const RoomPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // This is the direct Vercel URL for your backend project
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   useEffect(() => {
@@ -39,7 +38,7 @@ const RoomPage = () => {
 
   return (
     <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black">
-      <Heading as="h1" size="xl" color="brand.primaryBlueNeon"> {/* Room code heading is primary blue neon */}
+      <Heading as="h1" size="xl" color="brand.primaryBlueNeon">
         Welcome to Room: {roomCode}
       </Heading>
       <Text fontSize="lg" color="white">
@@ -47,12 +46,12 @@ const RoomPage = () => {
       </Text>
 
       <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.900" 
-           borderColor="brand.primaryBlueNeon" /* Box border is primary blue neon */
+           borderColor="brand.primaryBlueNeon"
            w="300px" textAlign="left" 
-           boxShadow="0 0 10px #00BFFF"> /* Box shadow is primary blue neon */
-        <Text fontWeight="bold" mb={2} color="brand.primaryBlueNeon">Players:</Text> {/* Players text is primary blue neon */}
+           boxShadow="0 0 10px #00BFFF">
+        <Text fontWeight="bold" mb={2} color="brand.primaryBlueNeon">Players:</Text>
         {loading ? (
-          <Spinner size="md" color="brand.primaryBlueNeon" /> /* Spinner is primary blue neon */
+          <Spinner size="md" color="brand.primaryBlueNeon" />
         ) : error ? (
           <Text color="red.500">{error}</Text>
         ) : players.length > 0 ? (
@@ -65,7 +64,6 @@ const RoomPage = () => {
           <Text color="white">No players in room yet.</Text>
         )}
       </Box>
-      {/* More game UI will go here */}
     </VStack>
   );
 };
