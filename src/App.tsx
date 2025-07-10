@@ -13,7 +13,7 @@ const LandingPageContent = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // Your backend URL (this will be updated in server.js for CORS)
+  // This is the direct Vercel URL for your backend project
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   const handleCreateRoom = async () => {
@@ -114,12 +114,11 @@ const LandingPageContent = () => {
         onChange={(e) => setPlayerNameInput(e.target.value)}
         w="300px"
         textAlign="center"
-        // Input styling (color, border, placeholder) now comes from theme.ts baseStyle
       />
 
       <Button
         colorScheme="brand"
-        variant="neon"      {/* CREATE NEW ROOM button uses default neon (magenta) */}
+        variant="neon"      /* CREATE NEW ROOM button uses default neon (magenta) */
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -138,11 +137,10 @@ const LandingPageContent = () => {
         onChange={(e) => setRoomCodeInput(e.target.value)}
         w="300px"
         textAlign="center"
-        // Input styling (color, border, placeholder) now comes from theme.ts baseStyle
       />
       <Button
-        colorScheme="brand" // Use 'brand' color scheme
-        variant="primaryNeonBlue"      {/* JOIN ROOM button uses primary blue neon */}
+        colorScheme="brand" 
+        variant="pureGreenNeon"      /* JOIN ROOM button uses pure green neon */
         size="lg"
         onClick={handleJoinRoom}
         w="200px"

@@ -13,6 +13,7 @@ const RoomPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // This is the direct Vercel URL for your backend project
   const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   useEffect(() => {
@@ -46,12 +47,12 @@ const RoomPage = () => {
       </Text>
 
       <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.900" 
-           borderColor="brand.primaryBlueNeon" // Box border is primary blue neon
+           borderColor="brand.primaryBlueNeon" /* Box border is primary blue neon */
            w="300px" textAlign="left" 
-           boxShadow="0 0 10px #00BFFF"> {/* Box shadow is primary blue neon */}
+           boxShadow="0 0 10px #00BFFF"> /* Box shadow is primary blue neon */
         <Text fontWeight="bold" mb={2} color="brand.primaryBlueNeon">Players:</Text> {/* Players text is primary blue neon */}
         {loading ? (
-          <Spinner size="md" color="brand.primaryBlueNeon" /> {/* Spinner is primary blue neon */}
+          <Spinner size="md" color="brand.primaryBlueNeon" /> /* Spinner is primary blue neon */
         ) : error ? (
           <Text color="red.500">{error}</Text>
         ) : players.length > 0 ? (
