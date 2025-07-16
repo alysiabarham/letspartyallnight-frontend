@@ -29,11 +29,11 @@ function RoomPage() {
   const [entries, setEntries] = useState<string[]>([]);
   const [entryText, setEntryText] = useState('');
   const [doneSubmitting, setDoneSubmitting] = useState(false);
-  const [category, setCategory] = useState('Things That Are Overrated'); // Hardcoded for now
+  const [category, setCategory] = useState('Things That Are Overrated'); // Can be randomized later
   const [judge, setJudge] = useState('');
   const [round, setRound] = useState(1);
 
-  // Auto-assign judge based on round and players
+  // Assign judge per round
   useEffect(() => {
     if (players.length > 0) {
       const index = (round - 1) % players.length;
@@ -45,21 +45,27 @@ function RoomPage() {
     socket.emit('joinGameRoom', roomCode);
 
     socket.on('playerJoined', ({ playerId }) => {
-      setPlayers((prev) => {
-        if (!prev.includes(playerId)) return [...prev, playerId];
-        return prev;
-      });
+      setPlayers((prev) => (!prev.includes(playerId) ? [...prev, playerId] : prev));
     });
 
     socket.on('newEntry', ({ entry }) => {
       setEntries((prev) => [...prev, entry]);
     });
 
+    socket.on('startRankingPhase', ({ judgeName }) => {
+      if (playerName === judgeName) {
+        navigate(`/judge/${roomCode}`);
+      } else {
+        navigate(`/guess/${roomCode}`);
+      }
+    });
+
     return () => {
       socket.off('playerJoined');
       socket.off('newEntry');
+      socket.off('startRankingPhase');
     };
-  }, [roomCode]);
+  }, [roomCode, playerName, navigate]);
 
   const handleEntrySubmit = () => {
     const trimmed = entryText.trim();
@@ -80,16 +86,16 @@ function RoomPage() {
 
   const handleDoneSubmitting = () => {
     setDoneSubmitting(true);
-    toast({ title: 'You marked yourself as done submitting.', status: 'info', duration: 3000, isClosable: true });
+    toast({ title: 'Marked as done submitting.', status: 'info', duration: 3000, isClosable: true });
   };
 
-  const handleAdvanceToJudgePhase = () => {
+  const handleAdvanceToRankingPhase = () => {
     if (entries.length < 5) {
-      toast({ title: 'Not enough entries yet.', description: 'At least 5 are required to proceed.', status: 'warning', duration: 4000, isClosable: true });
+      toast({ title: 'Not enough entries yet.', description: 'At least 5 needed.', status: 'warning', duration: 4000, isClosable: true });
       return;
     }
 
-    navigate(`/judge/${roomCode}`);
+    socket.emit('startRankingPhase', { roomCode, judgeName: judge });
   };
 
   const isJudge = playerName === judge;
@@ -105,7 +111,7 @@ function RoomPage() {
       {!isJudge && !doneSubmitting && (
         <>
           <Input
-            placeholder="Enter your ranked item"
+            placeholder="Enter an item"
             value={entryText}
             onChange={(e) => setEntryText(e.target.value)}
             size="lg"
@@ -139,7 +145,7 @@ function RoomPage() {
       {isJudge && (
         <Button
           colorScheme="pink"
-          onClick={handleAdvanceToJudgePhase}
+          onClick={handleAdvanceToRankingPhase}
         >
           Advance to Ranking Phase
         </Button>
