@@ -29,17 +29,26 @@ function RoomPage() {
   const [entries, setEntries] = useState<string[]>([]);
   const [entryText, setEntryText] = useState('');
   const [doneSubmitting, setDoneSubmitting] = useState(false);
-  const [category, setCategory] = useState('Things That Are Overrated'); // Can be randomized later
+  const [host, setHost] = useState('');
+  const [category, setCategory] = useState('');
   const [judge, setJudge] = useState('');
   const [round, setRound] = useState(1);
+  const [gameStarted, setGameStarted] = useState(false);
 
-  // Assign judge per round
+  // When players change, assign host if missing
   useEffect(() => {
-    if (players.length > 0) {
+    if (players.length > 0 && !host) {
+      setHost(players[0]); // First player is Host
+    }
+  }, [players, host]);
+
+  // Assign Judge when game starts or round changes
+  useEffect(() => {
+    if (players.length > 0 && gameStarted) {
       const index = (round - 1) % players.length;
       setJudge(players[index]);
     }
-  }, [players, round]);
+  }, [players, round, gameStarted]);
 
   useEffect(() => {
     socket.emit('joinGameRoom', roomCode);
@@ -66,6 +75,12 @@ function RoomPage() {
       socket.off('startRankingPhase');
     };
   }, [roomCode, playerName, navigate]);
+
+  const handleStartGame = () => {
+    setGameStarted(true);
+    setCategory('Things That Are Overrated'); // You can randomize later
+    toast({ title: 'Game started!', status: 'success', duration: 3000, isClosable: true });
+  };
 
   const handleEntrySubmit = () => {
     const trimmed = entryText.trim();
@@ -94,24 +109,35 @@ function RoomPage() {
       toast({ title: 'Not enough entries yet.', description: 'At least 5 needed.', status: 'warning', duration: 4000, isClosable: true });
       return;
     }
-
     socket.emit('startRankingPhase', { roomCode, judgeName: judge });
   };
 
   const isJudge = playerName === judge;
+  const isHost = playerName === host;
+  const isSpectator = !players.includes(playerName);
 
   return (
     <VStack spacing={6} p={6} minH="100vh" bg="#0F3460" color="white">
       <Heading size="lg" color="#FF00FF">Room: {roomCode}</Heading>
       <Heading size="md" color="#00FFFF">Game: Rank the Topic</Heading>
       <Text fontSize="xl">Welcome, {playerName}!</Text>
-      <Text fontSize="md" fontStyle="italic">Current Category: {category}</Text>
-      <Text fontSize="md">Judge this round: <strong>{judge}</strong></Text>
+      {host && <Text>Host: {host}</Text>}
+      {judge && <Text>Judge this round: <strong>{judge}</strong></Text>}
+      {category && <Text fontStyle="italic">Category: {category}</Text>}
 
-      {!isJudge && !doneSubmitting && (
+      {!gameStarted && isHost && (
+        <Button
+          colorScheme="yellow"
+          onClick={handleStartGame}
+        >
+          Start Game
+        </Button>
+      )}
+
+      {gameStarted && !isJudge && !isSpectator && !doneSubmitting && (
         <>
           <Input
-            placeholder="Enter an item"
+            placeholder="Enter your ranked item"
             value={entryText}
             onChange={(e) => setEntryText(e.target.value)}
             size="lg"
@@ -122,7 +148,6 @@ function RoomPage() {
             _placeholder={{ opacity: 0.7, color: "#FFFF00" }}
             _focus={{ borderColor: "#FFFF00", boxShadow: "0 0 5px #FFFF00" }}
           />
-
           <Button
             onClick={handleEntrySubmit}
             color="#00FF00"
@@ -132,17 +157,16 @@ function RoomPage() {
           >
             Submit Entry
           </Button>
-
           <Button
             onClick={handleDoneSubmitting}
-            colorScheme="yellow"
+            colorScheme="blue"
           >
             I'm Done Submitting
           </Button>
         </>
       )}
 
-      {isJudge && (
+      {gameStarted && isJudge && (
         <Button
           colorScheme="pink"
           onClick={handleAdvanceToRankingPhase}
@@ -153,13 +177,17 @@ function RoomPage() {
 
       <Box w="100%" maxW="400px" mt={6}>
         <Heading size="md" mb={2}>Submitted Entries:</Heading>
-        <List spacing={2}>
-          {entries.map((entry, idx) => (
-            <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
-              {entry}
-            </ListItem>
-          ))}
-        </List>
+        {entries.length === 0 ? (
+          <Text>No entries submitted yet.</Text>
+        ) : (
+          <List spacing={2}>
+            {entries.map((entry, idx) => (
+              <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
+                {entry}
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Box>
     </VStack>
   );
