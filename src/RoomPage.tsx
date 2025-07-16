@@ -1,77 +1,119 @@
 // src/RoomPage.tsx
-import { Box, Heading, Text, VStack, Spinner } from '@chakra-ui/react';
-import { useParams, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
+import {
+  VStack,
+  Heading,
+  Text,
+  Input,
+  Button,
+  Box,
+  List,
+  ListItem,
+  useToast
+} from '@chakra-ui/react';
+import { io } from 'socket.io-client';
 
-const RoomPage = () => {
-  const { roomCode } = useParams<{ roomCode: string }>();
+const socket = io('https://letspartyallnight-backend.vercel.app', {
+  withCredentials: true
+});
+
+function RoomPage() {
+  const { roomCode } = useParams();
   const location = useLocation();
-  const initialPlayerName = (location.state as { playerName?: string })?.playerName || 'You';
+  const playerName = location.state?.playerName || 'Guest';
+  const toast = useToast();
 
-  const [players, setPlayers] = useState([{ id: 'loading', name: initialPlayerName }]);
-  const [loading, setLoading] = useState(true); // This is line 13, ensure it's exactly as shown
-  const [error, setError] = useState<string | null>(null);
-
-  // IMPORTANT: This is your actual deployed backend URL from Vercel
-  const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
+  const [entryText, setEntryText] = useState('');
+  const [submittedEntries, setSubmittedEntries] = useState<string[]>([]);
+  const [category, setCategory] = useState('Things That Are Overrated'); // Placeholder category for testing
 
   useEffect(() => {
-    const fetchRoomDetails = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${BACKEND_URL}/room/${roomCode}`);
-        setPlayers(response.data.players);
-        setError(null);
-      } catch (err: any) {
-        console.error("Error fetching room details:", err.response?.data || err.message);
-        setError(err.response?.data?.error || "Failed to load room details.");
-        setPlayers([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Handle playerJoined events (optional visual feedback)
+    socket.on('playerJoined', ({ message }) => {
+      console.log(message);
+    });
 
-    if (roomCode) {
-      fetchRoomDetails();
+    // Listen for broadcasted entries
+    socket.on('newEntry', (data) => {
+      setSubmittedEntries((prev) => [...prev, data.entry]);
+    });
+
+    return () => {
+      socket.off('playerJoined');
+      socket.off('newEntry');
+    };
+  }, []);
+
+  const handleEntrySubmit = () => {
+    const trimmed = entryText.trim();
+    if (!trimmed) {
+      toast({
+        title: 'Entry cannot be empty.',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true
+      });
+      return;
     }
-  }, [roomCode]);
+
+    socket.emit('submitEntry', {
+      playerName,
+      roomCode,
+      entry: trimmed
+    });
+
+    setEntryText('');
+    toast({
+      title: 'Entry submitted!',
+      description: `"${trimmed}" added to pool.`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true
+    });
+  };
 
   return (
-    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="black">
-      <Heading 
-        as="h1" 
-        size="xl" 
-        color="#00BFFF"
-        textShadow="0 0 5px #00BFFF, 0 0 10px #00BFFF, 0 0 15px #00BFFF"
-      >
-        Welcome to Room: {roomCode}
-      </Heading>
-      <Text fontSize="lg" color="white">
-        This is your game lobby. Players will appear here.
-      </Text>
+    <VStack spacing={6} p={6} minH="100vh" bg="#0F3460" color="white">
+      <Heading size="lg" color="#FF00FF">Room: {roomCode}</Heading>
+      <Text fontSize="xl">Welcome, {playerName}!</Text>
+      <Text fontSize="lg" fontStyle="italic">Category: {category}</Text>
 
-      <Box p={4} borderWidth="1px" borderRadius="lg" bg="gray.900" 
-           borderColor="#00BFFF"
-           w="300px" textAlign="left" 
-           boxShadow="0 0 10px #00BFFF">
-        <Text fontWeight="bold" mb={2} color="#00BFFF">Players:</Text>
-        {loading ? (
-          <Spinner size="md" color="#00BFFF" />
-        ) : error ? (
-          <Text color="red.500">{error}</Text>
-        ) : players.length > 0 ? (
-          <VStack align="start" spacing={1}>
-            {players.map((player) => (
-              <Text key={player.id} color="white">{player.name}</Text>
-            ))}
-          </VStack>
-        ) : (
-          <Text color="white">No players in room yet.</Text>
-        )}
+      <Input
+        placeholder="Enter your ranked item"
+        value={entryText}
+        onChange={(e) => setEntryText(e.target.value)}
+        size="lg"
+        w="300px"
+        textAlign="center"
+        borderColor="#FFFF00"
+        color="#FFFF00"
+        _placeholder={{ opacity: 0.7, color: "#FFFF00" }}
+        _focus={{ borderColor: "#FFFF00", boxShadow: "0 0 5px #FFFF00" }}
+      />
+
+      <Button
+        onClick={handleEntrySubmit}
+        color="#00FF00"
+        border="2px solid #00FF00"
+        bg="transparent"
+        _hover={{ bg: "rgba(0,255,0,0.1)", boxShadow: "0 0 15px #00FF00" }}
+      >
+        Submit Entry
+      </Button>
+
+      <Box w="100%" maxW="400px" mt={6}>
+        <Heading size="md" mb={2}>Submitted Entries:</Heading>
+        <List spacing={2}>
+          {submittedEntries.map((entry, idx) => (
+            <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
+              {entry}
+            </ListItem>
+          ))}
+        </List>
       </Box>
     </VStack>
   );
-};
+}
 
 export default RoomPage;
