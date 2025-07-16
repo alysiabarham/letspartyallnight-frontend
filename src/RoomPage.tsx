@@ -14,7 +14,7 @@ const RoomPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // IMPORTANT: This is your actual deployed backend URL from Vercel
-  const BACKEND_URL = 'https://letspartyallnight-backend-secure-v4.vercel.app'; 
+  const BACKEND_URL = 'https://letspartyallnight-backend-secure-v5.vercel.app'; 
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
