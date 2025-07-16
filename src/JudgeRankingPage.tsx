@@ -12,7 +12,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const socket = io('https://letspartyallnight-backend.vercel.app', {
+const socket = io('https://letspartyallnight-backend.onrender.com', {
   withCredentials: true
 });
 

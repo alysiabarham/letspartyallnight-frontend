@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 
-const socket = io('https://letspartyallnight-backend.vercel.app', {
+const socket = io('https://letspartyallnight-backend.onrender.com', {
   withCredentials: true
 });
 
