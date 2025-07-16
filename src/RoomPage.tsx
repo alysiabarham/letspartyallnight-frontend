@@ -51,11 +51,15 @@ function RoomPage() {
   }, [players, round, gameStarted]);
 
   useEffect(() => {
-    socket.emit('joinGameRoom', roomCode);
+    socket.emit('joinGameRoom', {
+  roomCode,
+  playerName
+});
 
-    socket.on('playerJoined', ({ playerId }) => {
-      setPlayers((prev) => (!prev.includes(playerId) ? [...prev, playerId] : prev));
-    });
+    socket.on('playerJoined', ({ players }) => {
+  const names = players.map(p => p.name);
+  setPlayers(names);
+});
 
     socket.on('newEntry', ({ entry }) => {
       setEntries((prev) => [...prev, entry]);
@@ -176,19 +180,19 @@ function RoomPage() {
       )}
 
       <Box w="100%" maxW="400px" mt={6}>
-        <Heading size="md" mb={2}>Submitted Entries:</Heading>
-        {entries.length === 0 ? (
-          <Text>No entries submitted yet.</Text>
-        ) : (
-          <List spacing={2}>
-            {entries.map((entry, idx) => (
-              <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
-                {entry}
-              </ListItem>
-            ))}
-          </List>
-        )}
-      </Box>
+  <Heading size="md" mb={2}>Players in Room:</Heading>
+  {players.length === 0 ? (
+    <Text>No players yet.</Text>
+  ) : (
+    <List spacing={2}>
+      {players.map((p, i) => (
+        <ListItem key={i} p={2} bg="#1A1A2E" borderRadius="md">
+          {p}
+        </ListItem>
+      ))}
+    </List>
+  )}
+</Box>
     </VStack>
   );
 }
