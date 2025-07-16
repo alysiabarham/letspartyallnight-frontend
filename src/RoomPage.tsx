@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 
-const socket = io('https://letspartyallnight-backend.onrender.com', {
+const socket = io(process.env.REACT_APP_SOCKET_URL!, {
   withCredentials: true
 });
 
