@@ -80,7 +80,7 @@ function RoomPage() {
 
   const handleStartGame = () => {
     setGameStarted(true);
-    setCategory('Things That Are Overrated'); // Placeholder—you can randomize later
+    setCategory('Things That Are Overrated'); // You can randomize later
     toast({ title: 'Game started!', status: 'success', duration: 3000, isClosable: true });
   };
 
@@ -90,6 +90,8 @@ function RoomPage() {
       toast({ title: 'Entry cannot be empty.', status: 'warning', duration: 3000, isClosable: true });
       return;
     }
+
+    console.log("Submitting entry:", entryText, "by", playerName);
 
     socket.emit('submitEntry', {
       roomCode,
@@ -217,6 +219,18 @@ function RoomPage() {
             ))}
           </List>
         )}
+      </Box>
+
+      <Box mt={8} p={4} bg="#1A1A2E" borderRadius="md" border="1px solid #444">
+        <Heading size="sm" mb={2}>Debug Info</Heading>
+        <Text>playerName: {playerName}</Text>
+        <Text>host: {host}</Text>
+        <Text>judge: {judge}</Text>
+        <Text>isHost: {String(isHost)}</Text>
+        <Text>isJudge: {String(isJudge)}</Text>
+        <Text>isSpectator: {String(isSpectator)}</Text>
+        <Text>doneSubmitting: {String(doneSubmitting)}</Text>
+        <Text>gameStarted: {String(gameStarted)}</Text>
       </Box>
     </VStack>
   );
