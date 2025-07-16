@@ -56,8 +56,8 @@ function RoomPage() {
   playerName
 });
 
-    socket.on('playerJoined', ({ players }) => {
-  const names = players.map(p => p.name);
+    socket.on('playerJoined', ({ players }: { players: { id: string; name: string }[] }) => {
+  const names = players.map((p) => p.name);
   setPlayers(names);
 });
 
