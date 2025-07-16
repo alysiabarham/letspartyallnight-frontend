@@ -35,34 +35,19 @@ function RoomPage() {
   const [round, setRound] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
 
-  // When players change, assign host if missing
-  useEffect(() => {
-    if (players.length > 0 && !host) {
-      setHost(players[0]); // First player is Host
-    }
-  }, [players, host]);
-
-  // Assign Judge when game starts or round changes
-  useEffect(() => {
-    if (players.length > 0 && gameStarted) {
-      const index = (round - 1) % players.length;
-      setJudge(players[index]);
-    }
-  }, [players, round, gameStarted]);
-
   useEffect(() => {
     socket.emit('joinGameRoom', {
-  roomCode,
-  playerName
-});
+      roomCode,
+      playerName
+    });
 
     socket.on('playerJoined', ({ players }: { players: { id: string; name: string }[] }) => {
-  const names = players.map((p) => p.name);
-  setPlayers(names);
-});
+      const names = players.map(p => p.name);
+      setPlayers(names);
+    });
 
-    socket.on('newEntry', ({ entry }) => {
-      setEntries((prev) => [...prev, entry]);
+    socket.on('newEntry', ({ entry, playerName }) => {
+      setEntries(prev => [...prev, `${playerName}: ${entry}`]);
     });
 
     socket.on('startRankingPhase', ({ judgeName }) => {
@@ -80,9 +65,22 @@ function RoomPage() {
     };
   }, [roomCode, playerName, navigate]);
 
+  useEffect(() => {
+    if (players.length > 0 && !host) {
+      setHost(players[0]);
+    }
+  }, [players, host]);
+
+  useEffect(() => {
+    if (players.length > 0 && gameStarted) {
+      const newJudgeIndex = (round - 1) % players.length;
+      setJudge(players[newJudgeIndex]);
+    }
+  }, [players, round, gameStarted]);
+
   const handleStartGame = () => {
     setGameStarted(true);
-    setCategory('Things That Are Overrated'); // You can randomize later
+    setCategory('Things That Are Overrated'); // Placeholder—you can randomize later
     toast({ title: 'Game started!', status: 'success', duration: 3000, isClosable: true });
   };
 
@@ -100,20 +98,41 @@ function RoomPage() {
     });
 
     setEntryText('');
-    toast({ title: 'Entry submitted!', description: `"${trimmed}" added.`, status: 'success', duration: 3000, isClosable: true });
+    toast({
+      title: 'Entry submitted!',
+      description: `"${trimmed}" added.`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true
+    });
   };
 
   const handleDoneSubmitting = () => {
     setDoneSubmitting(true);
-    toast({ title: 'Marked as done submitting.', status: 'info', duration: 3000, isClosable: true });
+    toast({
+      title: 'Marked as done submitting.',
+      status: 'info',
+      duration: 3000,
+      isClosable: true
+    });
   };
 
   const handleAdvanceToRankingPhase = () => {
     if (entries.length < 5) {
-      toast({ title: 'Not enough entries yet.', description: 'At least 5 needed.', status: 'warning', duration: 4000, isClosable: true });
+      toast({
+        title: 'Not enough entries yet.',
+        description: 'At least 5 needed.',
+        status: 'warning',
+        duration: 4000,
+        isClosable: true
+      });
       return;
     }
-    socket.emit('startRankingPhase', { roomCode, judgeName: judge });
+
+    socket.emit('startRankingPhase', {
+      roomCode,
+      judgeName: judge
+    });
   };
 
   const isJudge = playerName === judge;
@@ -130,10 +149,7 @@ function RoomPage() {
       {category && <Text fontStyle="italic">Category: {category}</Text>}
 
       {!gameStarted && isHost && (
-        <Button
-          colorScheme="yellow"
-          onClick={handleStartGame}
-        >
+        <Button colorScheme="yellow" onClick={handleStartGame}>
           Start Game
         </Button>
       )}
@@ -161,38 +177,47 @@ function RoomPage() {
           >
             Submit Entry
           </Button>
-          <Button
-            onClick={handleDoneSubmitting}
-            colorScheme="blue"
-          >
+          <Button onClick={handleDoneSubmitting} colorScheme="blue">
             I'm Done Submitting
           </Button>
         </>
       )}
 
       {gameStarted && isJudge && (
-        <Button
-          colorScheme="pink"
-          onClick={handleAdvanceToRankingPhase}
-        >
+        <Button colorScheme="pink" onClick={handleAdvanceToRankingPhase}>
           Advance to Ranking Phase
         </Button>
       )}
 
       <Box w="100%" maxW="400px" mt={6}>
-  <Heading size="md" mb={2}>Players in Room:</Heading>
-  {players.length === 0 ? (
-    <Text>No players yet.</Text>
-  ) : (
-    <List spacing={2}>
-      {players.map((p, i) => (
-        <ListItem key={i} p={2} bg="#1A1A2E" borderRadius="md">
-          {p}
-        </ListItem>
-      ))}
-    </List>
-  )}
-</Box>
+        <Heading size="md" mb={2}>Players in Room:</Heading>
+        {players.length === 0 ? (
+          <Text>No players yet.</Text>
+        ) : (
+          <List spacing={2}>
+            {players.map((p, i) => (
+              <ListItem key={i} p={2} bg="#1A1A2E" borderRadius="md">
+                {p}
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Box>
+
+      <Box w="100%" maxW="400px" mt={6}>
+        <Heading size="md" mb={2}>Submitted Entries:</Heading>
+        {entries.length === 0 ? (
+          <Text>No entries submitted yet.</Text>
+        ) : (
+          <List spacing={2}>
+            {entries.map((entry, idx) => (
+              <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
+                {entry}
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Box>
     </VStack>
   );
 }
