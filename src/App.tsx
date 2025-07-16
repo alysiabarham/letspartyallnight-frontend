@@ -13,7 +13,7 @@ const LandingPageContent = () => {
   const navigate = useNavigate();
 
   // IMPORTANT: This is your actual deployed backend URL from Vercel
-  const BACKEND_URL = 'https://letspartyallnight-backend-secure-v2.vercel.app'; 
+  const BACKEND_URL = 'https://letspartyallnight-backend.vercel.app'; 
 
   // Function to handle player name input change with real-time filtering
   const handlePlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
