@@ -46,6 +46,11 @@ function RoomPage() {
       setPlayers(names);
     });
 
+    socket.on('gameStarted', ({ category }) => {
+      setGameStarted(true);
+      setCategory(category);
+    });
+
     socket.on('newEntry', ({ entry, playerName }) => {
       setEntries(prev => [...prev, `${playerName}: ${entry}`]);
     });
@@ -60,6 +65,7 @@ function RoomPage() {
 
     return () => {
       socket.off('playerJoined');
+      socket.off('gameStarted');
       socket.off('newEntry');
       socket.off('startRankingPhase');
     };
@@ -79,8 +85,10 @@ function RoomPage() {
   }, [players, round, gameStarted]);
 
   const handleStartGame = () => {
-    setGameStarted(true);
-    setCategory('Things That Are Overrated'); // You can randomize later
+    socket.emit('gameStarted', {
+      roomCode,
+      category: 'Things That Are Overrated'
+    });
     toast({ title: 'Game started!', status: 'success', duration: 3000, isClosable: true });
   };
 
