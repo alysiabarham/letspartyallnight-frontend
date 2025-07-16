@@ -1,12 +1,13 @@
 // src/App.tsx
 import { useState, useEffect } from 'react';
 import { Box, Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/react';
-import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 
 import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
+import GuesserRankingPage from './GuesserRankingPage';
 
 const socket = io('https://letspartyallnight-backend.vercel.app', {
   withCredentials: true
@@ -32,12 +33,12 @@ const LandingPageContent = () => {
 
   const handleCreateRoom = async () => {
     if (!playerNameInput.trim()) {
-      toast({ title: "Please enter your name.", status: "warning", duration: 3000, isClosable: true });
+      toast({ title: "Enter your name.", status: "warning", duration: 3000, isClosable: true });
       return;
     }
 
     if (!/^[a-zA-Z0-9]+$/.test(playerNameInput.trim())) {
-      toast({ title: "Invalid Name", description: "Name must be alphanumeric.", status: "error", duration: 5000, isClosable: true });
+      toast({ title: "Invalid Name", description: "Use only letters and numbers.", status: "error", duration: 5000, isClosable: true });
       return;
     }
 
@@ -46,29 +47,28 @@ const LandingPageContent = () => {
       const response = await axios.post(`${BACKEND_URL}/create-room`, { hostId });
       const { roomCode } = response.data;
 
-      toast({ title: "Room created!", description: `Your room code is: ${roomCode}`, status: "success", duration: 5000, isClosable: true });
-
+      toast({ title: "Room created!", description: `Code: ${roomCode}`, status: "success", duration: 5000, isClosable: true });
       socket.emit('joinGameRoom', roomCode);
       navigate(`/room/${roomCode}`, { state: { playerName: playerNameInput.trim() } });
     } catch (error: any) {
-      console.error("Error creating room:", error.response?.data || error.message);
+      console.error("Create error:", error.response?.data || error.message);
       toast({ title: "Error creating room.", description: error.response?.data?.error || "Try again later.", status: "error", duration: 5000, isClosable: true });
     }
   };
 
   const handleJoinRoom = async () => {
     if (!roomCodeInput.trim() || !playerNameInput.trim()) {
-      toast({ title: "Please enter name and room code.", status: "warning", duration: 3000, isClosable: true });
+      toast({ title: "Enter name and code.", status: "warning", duration: 3000, isClosable: true });
       return;
     }
 
     if (!/^[a-zA-Z0-9]+$/.test(playerNameInput.trim())) {
-      toast({ title: "Invalid Name", description: "Name must be alphanumeric.", status: "error", duration: 5000, isClosable: true });
+      toast({ title: "Invalid Name", description: "Use only letters and numbers.", status: "error", duration: 5000, isClosable: true });
       return;
     }
 
     if (!/^[a-zA-Z0-9]+$/.test(roomCodeInput.trim())) {
-      toast({ title: "Invalid Room Code", description: "Code must be alphanumeric.", status: "error", duration: 5000, isClosable: true });
+      toast({ title: "Invalid Code", description: "Code must be alphanumeric.", status: "error", duration: 5000, isClosable: true });
       return;
     }
 
@@ -80,19 +80,23 @@ const LandingPageContent = () => {
       });
 
       const { room } = response.data;
-      toast({ title: "Room joined!", description: `You joined room: ${room.code}`, status: "success", duration: 5000, isClosable: true });
-
+      toast({ title: "Room joined!", description: `Joined: ${room.code}`, status: "success", duration: 5000, isClosable: true });
       socket.emit('joinGameRoom', room.code);
       navigate(`/room/${room.code}`, { state: { playerName: playerNameInput.trim() } });
     } catch (error: any) {
-      console.error("Error joining room:", error.response?.data || error.message);
-      toast({ title: "Error joining room.", description: error.response?.data?.error || "Room not found or full.", status: "error", duration: 5000, isClosable: true });
+      console.error("Join error:", error.response?.data || error.message);
+      toast({ title: "Join failed.", description: error.response?.data?.error || "Room not found or full.", status: "error", duration: 5000, isClosable: true });
     }
   };
 
   return (
-    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E"> 
-      <Heading as="h1" size="2xl" color="#FF00FF" textShadow="0 0 5px #FF00FF, 0 0 10px #FF00FF, 0 0 15px #FF00FF">
+    <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E">
+      <Heading 
+        as="h1" 
+        size="2xl" 
+        color="#FF00FF"
+        textShadow="0 0 5px #FF00FF, 0 0 15px #FF00FF"
+      >
         Let's Party All Night!
       </Heading>
       <Text fontSize="lg" color="white">
@@ -118,8 +122,8 @@ const LandingPageContent = () => {
         bg="transparent"
         color="#FF00FF"
         border="2px solid #FF00FF"
-        boxShadow="0 0 5px #FF00FF"
-        _hover={{ bg: "rgba(255,0,255,0.1)", boxShadow: "0 0 15px #FF00FF" }}
+        boxShadow="0 0 15px #FF00FF"
+        _hover={{ bg: "rgba(255,0,255,0.1)", boxShadow: "0 0 20px #FF00FF" }}
         size="lg"
         onClick={handleCreateRoom}
         w="200px"
@@ -141,14 +145,14 @@ const LandingPageContent = () => {
         _focus={{ borderColor: "#FFFF00", boxShadow: "0 0 5px #FFFF00" }}
         _placeholder={{ color: "#FFFF00", opacity: 0.7 }}
         pattern="^[a-zA-Z0-9]*$"
-        title="Alphanumeric code only"
+        title="Alphanumeric only"
       />
       <Button
         bg="transparent"
         color="#00FF00"
         border="2px solid #00FF00"
-        boxShadow="0 0 5px #00FF00"
-        _hover={{ bg: "rgba(0,255,0,0.1)", boxShadow: "0 0 15px #00FF00" }}
+        boxShadow="0 0 15px #00FF00"
+        _hover={{ bg: "rgba(0,255,0,0.1)", boxShadow: "0 0 20px #00FF00" }}
         size="lg"
         onClick={handleJoinRoom}
         w="200px"
@@ -165,6 +169,7 @@ function App() {
       <Route path="/" element={<LandingPageContent />} />
       <Route path="/room/:roomCode" element={<RoomPage />} />
       <Route path="/judge/:roomCode" element={<JudgeRankingPage />} />
+      <Route path="/guess/:roomCode" element={<GuesserRankingPage />} />
     </Routes>
   );
 }
