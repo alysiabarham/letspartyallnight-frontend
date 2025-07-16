@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Box, Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/react';
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
@@ -9,7 +9,8 @@ import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
 
-const socket = io(process.env.REACT_APP_SOCKET_URL!, {
+const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
+const socket = io(BACKEND_URL, {
   withCredentials: true
 });
 
@@ -18,8 +19,6 @@ const LandingPageContent = () => {
   const [playerNameInput, setPlayerNameInput] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
-
-  const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
 
   const handlePlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const filteredValue = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
@@ -48,8 +47,8 @@ const LandingPageContent = () => {
       const { roomCode } = response.data;
 
       toast({ title: "Room created!", description: `Code: ${roomCode}`, status: "success", duration: 5000, isClosable: true });
-      socket.emit('joinGameRoom', roomCode);
-      navigate(`/room/${roomCode}`, { state: { playerName: playerNameInput.trim() } });
+      socket.emit('joinGameRoom', { roomCode, playerName: hostId });
+      navigate(`/room/${roomCode}`, { state: { playerName: hostId } });
     } catch (error: any) {
       console.error("Create error:", error.response?.data || error.message);
       toast({ title: "Error creating room.", description: error.response?.data?.error || "Try again later.", status: "error", duration: 5000, isClosable: true });
@@ -81,8 +80,8 @@ const LandingPageContent = () => {
 
       const { room } = response.data;
       toast({ title: "Room joined!", description: `Joined: ${room.code}`, status: "success", duration: 5000, isClosable: true });
-      socket.emit('joinGameRoom', room.code);
-      navigate(`/room/${room.code}`, { state: { playerName: playerNameInput.trim() } });
+      socket.emit('joinGameRoom', { roomCode: room.code, playerName: playerId });
+      navigate(`/room/${room.code}`, { state: { playerName: playerId } });
     } catch (error: any) {
       console.error("Join error:", error.response?.data || error.message);
       toast({ title: "Join failed.", description: error.response?.data?.error || "Room not found or full.", status: "error", duration: 5000, isClosable: true });
