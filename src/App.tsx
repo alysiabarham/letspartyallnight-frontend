@@ -9,7 +9,7 @@ import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
 
-const socket = io('process.env.REACT_APP_SOCKET_URL!', {
+const socket = io(process.env.REACT_APP_SOCKET_URL!, {
   withCredentials: true
 });
 
@@ -19,7 +19,7 @@ const LandingPageContent = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const BACKEND_URL = 'process.env.REACT_APP_SOCKET_URL!';
+  const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
 
   const handlePlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const filteredValue = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
