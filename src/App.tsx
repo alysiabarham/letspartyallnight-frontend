@@ -15,6 +15,20 @@ const LandingPageContent = () => {
   // IMPORTANT: This is your actual deployed backend URL from Vercel
   const BACKEND_URL = 'https://letspartyallnight-backend-secure.vercel.app'; 
 
+  // Function to handle player name input change with real-time filtering
+  const handlePlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Replace any non-alphanumeric characters with an empty string
+    const filteredValue = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+    setPlayerNameInput(filteredValue);
+  };
+
+  // Function to handle room code input change with real-time filtering
+  const handleRoomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Replace any non-alphanumeric characters with an empty string
+    const filteredValue = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+    setRoomCodeInput(filteredValue);
+  };
+
   const handleCreateRoom = async () => {
     if (!playerNameInput.trim()) {
       toast({
@@ -26,7 +40,7 @@ const LandingPageContent = () => {
       return;
     }
 
-    // Frontend validation: Ensure player name is alphanumeric
+    // Frontend validation: Ensure player name is alphanumeric (redundant with real-time filter but good for safety)
     if (!/^[a-zA-Z0-9]+$/.test(playerNameInput.trim())) {
       toast({
         title: "Invalid Name",
@@ -77,7 +91,7 @@ const LandingPageContent = () => {
       return;
     }
 
-    // Frontend validation: Ensure player name is alphanumeric
+    // Frontend validation: Ensure player name is alphanumeric (redundant with real-time filter but good for safety)
     if (!/^[a-zA-Z0-9]+$/.test(playerNameInput.trim())) {
       toast({
         title: "Invalid Name",
@@ -89,7 +103,7 @@ const LandingPageContent = () => {
       return;
     }
 
-    // Frontend validation: Ensure room code is alphanumeric
+    // Frontend validation: Ensure room code is alphanumeric (redundant with real-time filter but good for safety)
     if (!/^[a-zA-Z0-9]+$/.test(roomCodeInput.trim())) {
       toast({
         title: "Invalid Room Code",
@@ -151,7 +165,7 @@ const LandingPageContent = () => {
         placeholder="Enter Your Name (Alphanumeric Only)"
         size="lg"
         value={playerNameInput}
-        onChange={(e) => setPlayerNameInput(e.target.value)}
+        onChange={handlePlayerNameChange} // Use the new real-time filtering handler
         w="300px"
         textAlign="center"
         color="#FFFF00"
@@ -164,7 +178,7 @@ const LandingPageContent = () => {
           color: "#FFFF00",
           opacity: 0.7
         }}
-        // HTML5 pattern for client-side validation (alphanumeric only)
+        // HTML5 pattern for client-side validation (alphanumeric only) - still good for accessibility/fallback
         pattern="^[a-zA-Z0-9]*$" 
         title="Name must contain only letters and numbers"
       />
@@ -193,7 +207,7 @@ const LandingPageContent = () => {
         placeholder="Enter Room Code (Alphanumeric Only)"
         size="lg"
         value={roomCodeInput}
-        onChange={(e) => setRoomCodeInput(e.target.value)}
+        onChange={handleRoomCodeChange} // Use the new real-time filtering handler
         w="300px"
         textAlign="center"
         color="#FFFF00"
@@ -206,7 +220,7 @@ const LandingPageContent = () => {
           color: "#FFFF00",
           opacity: 0.7
         }}
-        // HTML5 pattern for client-side validation (alphanumeric only)
+        // HTML5 pattern for client-side validation (alphanumeric only) - still good for accessibility/fallback
         pattern="^[a-zA-Z0-9]*$"
         title="Room code must contain only letters and numbers"
       />
