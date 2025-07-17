@@ -64,7 +64,7 @@ function GuesserRankingPage() {
     socket.emit('requestEntries', { roomCode });
 
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
-      console.log('✅ Received entries for guessing:', entries);
+      console.log('✅ Received selected entries for guessing:', entries);
       setEntries(entries);
     });
 
@@ -122,7 +122,7 @@ function GuesserRankingPage() {
           {entries.length === 0 ? (
             <Box pt={10} textAlign="center">
               <Spinner size="lg" />
-              <Text pt={4}>Waiting for entries to appear...</Text>
+              <Text pt={4}>Waiting for Judge’s selected entries...</Text>
             </Box>
           ) : (
             <Box w="100%" maxW="400px">
