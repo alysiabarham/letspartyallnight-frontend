@@ -140,10 +140,9 @@ function RoomPage() {
     }
 
     socket.emit('startRankingPhase', {
-      roomCode,
-      judgeName: judge
-    });
-  };
+  roomCode,
+  judgeName: judge
+});
 
   const isJudge = playerName === judge;
   const isHost = playerName === host;
@@ -194,10 +193,10 @@ function RoomPage() {
       )}
 
       {gameStarted && isJudge && (
-        <Button colorScheme="pink" onClick={handleAdvanceToRankingPhase}>
-          Advance to Ranking Phase
-        </Button>
-      )}
+  <Button colorScheme="pink" onClick={handleAdvanceToRankingPhase}>
+    Advance to Ranking Phase
+  </Button>
+)}
 
       <Box w="100%" maxW="400px" mt={6}>
         <Heading size="md" mb={2}>Players in Room:</Heading>
