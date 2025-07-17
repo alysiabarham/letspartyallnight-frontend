@@ -65,6 +65,12 @@ function GuesserRankingPage() {
 
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
       console.log('✅ Received selected entries for guessing:', entries);
+
+      if (!entries || entries.length < 1) {
+        console.log("❌ No entries received from backend. Waiting...");
+        return;
+      }
+
       setEntries(entries);
     });
 
@@ -86,6 +92,22 @@ function GuesserRankingPage() {
     };
   }, [roomCode]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (entries.length === 0) {
+        toast({
+          title: "Still waiting on Judge...",
+          description: "The Judge may not have submitted yet.",
+          status: "warning",
+          duration: 6000,
+          isClosable: true
+        });
+      }
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [entries]);
+
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
@@ -100,6 +122,7 @@ function GuesserRankingPage() {
       roomCode,
       guess: entries
     });
+
     setSubmitted(true);
     toast({
       title: 'Guess submitted!',
@@ -143,6 +166,7 @@ function GuesserRankingPage() {
               Submit Your Guess
             </Button>
           )}
+
           {submitted && (
             <Text fontSize="md" color="green.300">
               Ranking submitted. Waiting for results...
