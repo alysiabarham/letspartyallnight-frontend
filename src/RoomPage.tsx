@@ -51,9 +51,9 @@ function RoomPage() {
       setCategory(category);
     });
 
-    socket.on('newEntry', ({ entry, playerName }) => {
-      setEntries(prev => [...prev, `${playerName}: ${entry}`]);
-    });
+    socket.on('newEntry', ({ entry }) => {
+  setEntries(prev => [...prev, entry]);
+});
 
     socket.on('startRankingPhase', ({ judgeName }) => {
       if (playerName === judgeName) {
@@ -214,20 +214,22 @@ function RoomPage() {
         )}
       </Box>
 
-      <Box w="100%" maxW="400px" mt={6}>
-        <Heading size="md" mb={2}>Submitted Entries:</Heading>
-        {entries.length === 0 ? (
-          <Text>No entries submitted yet.</Text>
-        ) : (
-          <List spacing={2}>
-            {entries.map((entry, idx) => (
-              <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
-                {entry}
-              </ListItem>
-            ))}
-          </List>
-        )}
-      </Box>
+      {isJudge && entries.length >= 5 && doneSubmitting && (
+  <Box w="100%" maxW="400px" mt={6}>
+    <Heading size="md" mb={2}>Submitted Entries:</Heading>
+    {entries.length === 0 ? (
+      <Text>No entries submitted yet.</Text>
+    ) : (
+      <List spacing={2}>
+        {entries.map((entry, idx) => (
+          <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
+            {entry}
+          </ListItem>
+        ))}
+      </List>
+    )}
+  </Box>
+)}
 
     </VStack>
   );
