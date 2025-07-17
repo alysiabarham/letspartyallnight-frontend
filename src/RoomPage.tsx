@@ -128,21 +128,22 @@ function RoomPage() {
   };
 
   const handleAdvanceToRankingPhase = () => {
-    if (entries.length < 5) {
-      toast({
-        title: 'Not enough entries yet.',
-        description: 'At least 5 needed.',
-        status: 'warning',
-        duration: 4000,
-        isClosable: true
-      });
-      return;
-    }
+  if (entries.length < 5) {
+    toast({
+      title: 'Not enough entries yet.',
+      description: 'At least 5 needed.',
+      status: 'warning',
+      duration: 4000,
+      isClosable: true
+    });
+    return;
+  }
 
-    socket.emit('startRankingPhase', {
-  roomCode,
-  judgeName: judge
-});
+  socket.emit('startRankingPhase', {
+    roomCode,
+    judgeName: judge
+  });
+};
 
   const isJudge = playerName === judge;
   const isHost = playerName === host;
@@ -230,7 +231,8 @@ function RoomPage() {
   </Box>
 )}
 
-        </VStack>
+            </VStack>
   );
 }
+
 export default RoomPage;
