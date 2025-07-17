@@ -61,19 +61,21 @@ function JudgeRankingPage() {
 
   useEffect(() => {
     socket.on('sendAllEntries', ({ entries }) => {
-      const unique = Array.from(new Set(entries));
-      setAllEntries(unique);
+      console.log('✅ Judge received entries:', entries);
 
-      const autoPick = unique.slice(0, 5);
+      // Filter to 5 unique entries
+      const uniqueEntries = Array.from(new Set(entries));
+      const autoPick = uniqueEntries.slice(0, 5);
+      setAllEntries(uniqueEntries);
       setSelectedEntries(autoPick);
     });
 
-    socket.on('revealResults', ({ judgeRanking, guesses }) => {
+    socket.on('revealResults', ({ judgeRanking }) => {
       toast({
         title: 'Game Complete!',
-        description: 'Final ranking and guesses have been revealed.',
+        description: 'Final ranking and guesses revealed!',
         status: 'success',
-        duration: 6000,
+        duration: 5000,
         isClosable: true
       });
     });
@@ -102,8 +104,8 @@ function JudgeRankingPage() {
   const handleSubmit = () => {
     if (selectedEntries.length < 5 || new Set(selectedEntries).size < 5) {
       toast({
-        title: 'Entries must be 5 unique items.',
-        description: 'Please swap duplicates before submitting.',
+        title: 'Need 5 unique entries',
+        description: 'Duplicate items detected—please fix before submitting.',
         status: 'error',
         duration: 4000,
         isClosable: true
@@ -127,9 +129,9 @@ function JudgeRankingPage() {
 
   return (
     <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
-      <Heading size="lg" color="#FF00FF">Judge Mode: Select & Rank Entries</Heading>
+      <Heading size="lg" color="#FF00FF">Judge Mode: Choose & Rank Top 5</Heading>
       <Text fontSize="md" fontStyle="italic">
-        You received {allEntries.length} entries. Choose your top 5 (must be unique) and drag to rank them.
+        You received {allEntries.length} entries. Pick 5 unique responses and rank them.
       </Text>
 
       {selectedEntries.map((entry, idx) => (
@@ -149,9 +151,7 @@ function JudgeRankingPage() {
         </Box>
       ))}
 
-      <Heading size="md" color="yellow.300" pt={6}>
-        Drag to Set Final Order
-      </Heading>
+      <Heading size="md" color="yellow.300" pt={6}>Drag to Set Final Order</Heading>
 
       <Box w="100%" maxW="400px">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -170,7 +170,6 @@ function JudgeRankingPage() {
           Submit Final Ranking
         </Button>
       )}
-
       {submitted && (
         <Text fontSize="md" color="green.300">
           Ranking submitted. Waiting for guesses...
