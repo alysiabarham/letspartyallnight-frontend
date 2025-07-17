@@ -61,18 +61,24 @@ function JudgeRankingPage() {
   const toast = useToast();
   const sensors = useSensors(useSensor(PointerSensor));
 
+  console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
+
   useEffect(() => {
     socket.emit('requestEntries', { roomCode });
 
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
-      console.log('✅ Judge received entries:', entries);
+  console.log("📦 Judge received entries:", entries);
+  if (!entries || entries.length === 0) {
+    console.log("❌ No entries received. Staying in loading state.");
+    return;
+  }
 
-      const uniqueEntries = Array.from(new Set(entries));
-      const autoPick = uniqueEntries.slice(0, 5);
+  const uniqueEntries = Array.from(new Set(entries));
+  const autoPick = uniqueEntries.slice(0, 5);
 
-      setAllEntries(uniqueEntries);
-      setSelectedEntries(autoPick);
-    });
+  setAllEntries(uniqueEntries);
+  setSelectedEntries(autoPick);
+});
 
     socket.on('revealResults', ({ judgeRanking }: { judgeRanking: string[] }) => {
       toast({
@@ -147,11 +153,12 @@ function JudgeRankingPage() {
       </Text>
 
       {allEntries.length === 0 ? (
-        <Box textAlign="center" pt={10}>
-          <Spinner size="lg" />
-          <Text pt={4}>Waiting for entries from players...</Text>
-        </Box>
-      ) : (
+  <Box textAlign="center" pt={10}>
+    <Spinner size="lg" />
+    <Text pt={4}>Waiting for entries from players...</Text>
+  </Box>
+) : (
+  // actual ranking UI
         <>
           {selectedEntries.map((entry, idx) => (
             <Box key={idx} w="100%" maxW="400px">
