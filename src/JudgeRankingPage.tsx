@@ -25,7 +25,7 @@ import {
   Spinner
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 const socket = io(process.env.REACT_APP_SOCKET_URL!, {
@@ -54,6 +54,7 @@ const SortableItem = ({ id, index }: { id: string; index: number }) => {
 
 function JudgeRankingPage() {
   const { roomCode } = useParams();
+  const navigate = useNavigate();
   const [allEntries, setAllEntries] = useState<string[]>([]);
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -62,6 +63,7 @@ function JudgeRankingPage() {
 
   useEffect(() => {
     socket.emit('requestEntries', { roomCode });
+
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
       console.log('✅ Judge received entries:', entries);
 
@@ -86,7 +88,7 @@ function JudgeRankingPage() {
       socket.off('sendAllEntries');
       socket.off('revealResults');
     };
-  }, []);
+  }, [roomCode]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -115,11 +117,15 @@ function JudgeRankingPage() {
       return;
     }
 
+    console.log("✅ Submitting final ranking to server:", selectedEntries);
+
     socket.emit('submitRanking', {
       roomCode,
       ranking: selectedEntries
     });
+
     setSubmitted(true);
+
     toast({
       title: 'Ranking submitted!',
       description: 'Waiting for guesses...',
@@ -127,6 +133,10 @@ function JudgeRankingPage() {
       duration: 4000,
       isClosable: true
     });
+
+    // Optional: redirect players to guessing phase
+    socket.emit('advanceToGuessingPhase', { roomCode });
+    navigate(`/guess/${roomCode}`);
   };
 
   return (
