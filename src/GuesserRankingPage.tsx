@@ -60,8 +60,8 @@ function GuesserRankingPage() {
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    // ✅ Listen for full entries broadcast
     socket.on('sendAllEntries', ({ entries }) => {
+      console.log('✅ Received entries from server:', entries);
       setEntries(entries);
     });
 
@@ -128,7 +128,7 @@ function GuesserRankingPage() {
             </DndContext>
           </Box>
 
-          {!submitted && (
+          {!submitted && entries.length > 0 && (
             <Button colorScheme="green" onClick={handleSubmit}>
               Submit Your Guess
             </Button>
