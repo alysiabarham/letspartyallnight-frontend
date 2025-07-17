@@ -60,8 +60,14 @@ function JudgeRankingPage() {
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    socket.on('sendAllEntries', ({ entries }) => {
-      console.log('✅ Judge received entries:', entries);
+    socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
+  console.log('✅ Judge received entries:', entries);
+
+  const uniqueEntries = Array.from(new Set(entries));
+  const autoPick = uniqueEntries.slice(0, 5);
+  setAllEntries(uniqueEntries);
+  setSelectedEntries(autoPick);
+});
 
       // Filter to 5 unique entries
       const uniqueEntries = Array.from(new Set(entries));
