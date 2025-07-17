@@ -230,8 +230,7 @@ function RoomPage() {
   </Box>
 )}
 
-    </VStack>
+        </VStack>
   );
 }
-
 export default RoomPage;
