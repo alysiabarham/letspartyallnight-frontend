@@ -1,3 +1,4 @@
+// src/GuesserRankingPage.tsx
 import {
   DndContext,
   closestCenter,
@@ -56,13 +57,12 @@ function GuesserRankingPage() {
   const [resultsVisible, setResultsVisible] = useState(false);
   const [finalRanking, setFinalRanking] = useState<string[]>([]);
   const toast = useToast();
-
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    // Fetch entries from server
-    socket.on('newEntry', ({ entry, playerName }) => {
-      setEntries((prev) => [...prev, `${playerName}: ${entry}`]);
+    // ✅ Listen for full entries broadcast
+    socket.on('sendAllEntries', ({ entries }) => {
+      setEntries(entries);
     });
 
     socket.on('revealResults', ({ judgeRanking }) => {
@@ -78,7 +78,7 @@ function GuesserRankingPage() {
     });
 
     return () => {
-      socket.off('newEntry');
+      socket.off('sendAllEntries');
       socket.off('revealResults');
     };
   }, []);
