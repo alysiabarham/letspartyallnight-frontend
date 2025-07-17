@@ -61,6 +61,7 @@ function JudgeRankingPage() {
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
+    socket.emit('requestEntries', { roomCode });
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
       console.log('✅ Judge received entries:', entries);
 
