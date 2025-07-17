@@ -52,17 +52,19 @@ function RoomPage() {
     });
 
     socket.on('newEntry', ({ entry }) => {
-  setEntries(prev => [...prev, entry]);
-});
+      setEntries(prev => [...prev, entry]);
+    });
 
     socket.on('startRankingPhase', ({ judgeName }) => {
-  console.log("🔔 Received startRankingPhase:", judgeName, "I am:", playerName);
-  if (playerName === judgeName) {
-    navigate(`/judge/${roomCode}`);
-  } else {
-    navigate(`/guess/${roomCode}`);
-  }
-});
+      console.log("🔔 Received startRankingPhase. Judge is:", judgeName, "I am:", playerName);
+      if (playerName === judgeName) {
+        console.log("✅ I am the Judge. Navigating to /judge");
+        navigate(`/judge/${roomCode}`);
+      } else {
+        console.log("🕵️ I am a guesser. Navigating to /guess");
+        navigate(`/guess/${roomCode}`);
+      }
+    });
 
     return () => {
       socket.off('playerJoined');
@@ -100,8 +102,6 @@ function RoomPage() {
       return;
     }
 
-    console.log("Submitting entry:", entryText, "by", playerName);
-
     socket.emit('submitEntry', {
       roomCode,
       playerName,
@@ -129,22 +129,22 @@ function RoomPage() {
   };
 
   const handleAdvanceToRankingPhase = () => {
-  if (entries.length < 5) {
-    toast({
-      title: 'Not enough entries yet.',
-      description: 'At least 5 needed.',
-      status: 'warning',
-      duration: 4000,
-      isClosable: true
-    });
-    return;
-  }
+    if (entries.length < 5) {
+      toast({
+        title: 'Not enough entries yet.',
+        description: 'At least 5 needed.',
+        status: 'warning',
+        duration: 4000,
+        isClosable: true
+      });
+      return;
+    }
 
-  socket.emit('startRankingPhase', {
-    roomCode,
-    judgeName: judge
-  });
-};
+    socket.emit('startRankingPhase', {
+      roomCode,
+      judgeName: judge
+    });
+  };
 
   const isJudge = playerName === judge;
   const isHost = playerName === host;
@@ -195,10 +195,10 @@ function RoomPage() {
       )}
 
       {gameStarted && isJudge && (
-  <Button colorScheme="pink" onClick={handleAdvanceToRankingPhase}>
-    Advance to Ranking Phase
-  </Button>
-)}
+        <Button colorScheme="pink" onClick={handleAdvanceToRankingPhase}>
+          Advance to Ranking Phase
+        </Button>
+      )}
 
       <Box w="100%" maxW="400px" mt={6}>
         <Heading size="md" mb={2}>Players in Room:</Heading>
@@ -214,25 +214,7 @@ function RoomPage() {
           </List>
         )}
       </Box>
-
-      {isJudge && entries.length >= 5 && doneSubmitting && (
-  <Box w="100%" maxW="400px" mt={6}>
-    <Heading size="md" mb={2}>Submitted Entries:</Heading>
-    {entries.length === 0 ? (
-      <Text>No entries submitted yet.</Text>
-    ) : (
-      <List spacing={2}>
-        {entries.map((entry, idx) => (
-          <ListItem key={idx} p={2} bg="#16213E" borderRadius="md">
-            {entry}
-          </ListItem>
-        ))}
-      </List>
-    )}
-  </Box>
-)}
-
-            </VStack>
+    </VStack>
   );
 }
 
