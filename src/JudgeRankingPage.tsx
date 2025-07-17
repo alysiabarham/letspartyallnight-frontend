@@ -21,7 +21,8 @@ import {
   Box,
   Text,
   Select,
-  useToast
+  useToast,
+  Spinner
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -61,22 +62,16 @@ function JudgeRankingPage() {
 
   useEffect(() => {
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
-  console.log('✅ Judge received entries:', entries);
+      console.log('✅ Judge received entries:', entries);
 
-  const uniqueEntries = Array.from(new Set(entries));
-  const autoPick = uniqueEntries.slice(0, 5);
-  setAllEntries(uniqueEntries);
-  setSelectedEntries(autoPick);
-});
-
-      // Filter to 5 unique entries
       const uniqueEntries = Array.from(new Set(entries));
       const autoPick = uniqueEntries.slice(0, 5);
+
       setAllEntries(uniqueEntries);
       setSelectedEntries(autoPick);
     });
 
-    socket.on('revealResults', ({ judgeRanking }) => {
+    socket.on('revealResults', ({ judgeRanking }: { judgeRanking: string[] }) => {
       toast({
         title: 'Game Complete!',
         description: 'Final ranking and guesses revealed!',
@@ -137,49 +132,58 @@ function JudgeRankingPage() {
     <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
       <Heading size="lg" color="#FF00FF">Judge Mode: Choose & Rank Top 5</Heading>
       <Text fontSize="md" fontStyle="italic">
-        You received {allEntries.length} entries. Pick 5 unique responses and rank them.
+        Select 5 unique responses and drag to rank them.
       </Text>
 
-      {selectedEntries.map((entry, idx) => (
-        <Box key={idx} w="100%" maxW="400px">
-          <Text color="gray.300">Slot #{idx + 1}</Text>
-          <Select
-            value={entry}
-            onChange={(e) => handleSwap(idx, e.target.value)}
-            bg="#16213E"
-            color="white"
-            borderColor="#FF00FF"
-          >
-            {allEntries.map((opt, i) => (
-              <option key={i} value={opt}>{opt}</option>
-            ))}
-          </Select>
+      {allEntries.length === 0 ? (
+        <Box textAlign="center" pt={10}>
+          <Spinner size="lg" />
+          <Text pt={4}>Waiting for entries from players...</Text>
         </Box>
-      ))}
+      ) : (
+        <>
+          {selectedEntries.map((entry, idx) => (
+            <Box key={idx} w="100%" maxW="400px">
+              <Text color="gray.300">Slot #{idx + 1}</Text>
+              <Select
+                value={entry}
+                onChange={(e) => handleSwap(idx, e.target.value)}
+                bg="#16213E"
+                color="white"
+                borderColor="#FF00FF"
+              >
+                {allEntries.map((opt, i) => (
+                  <option key={i} value={opt}>{opt}</option>
+                ))}
+              </Select>
+            </Box>
+          ))}
 
-      <Heading size="md" color="yellow.300" pt={6}>Drag to Set Final Order</Heading>
+          <Heading size="md" color="yellow.300" pt={6}>Drag to Set Final Order</Heading>
 
-      <Box w="100%" maxW="400px">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={selectedEntries} strategy={verticalListSortingStrategy}>
-            <VStack spacing={3}>
-              {selectedEntries.map((item, index) => (
-                <SortableItem key={item} id={item} index={index} />
-              ))}
-            </VStack>
-          </SortableContext>
-        </DndContext>
-      </Box>
+          <Box w="100%" maxW="400px">
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={selectedEntries} strategy={verticalListSortingStrategy}>
+                <VStack spacing={3}>
+                  {selectedEntries.map((item, index) => (
+                    <SortableItem key={item} id={item} index={index} />
+                  ))}
+                </VStack>
+              </SortableContext>
+            </DndContext>
+          </Box>
 
-      {!submitted && (
-        <Button colorScheme="green" onClick={handleSubmit}>
-          Submit Final Ranking
-        </Button>
-      )}
-      {submitted && (
-        <Text fontSize="md" color="green.300">
-          Ranking submitted. Waiting for guesses...
-        </Text>
+          {!submitted && (
+            <Button colorScheme="green" onClick={handleSubmit}>
+              Submit Final Ranking
+            </Button>
+          )}
+          {submitted && (
+            <Text fontSize="md" color="green.300">
+              Ranking submitted. Waiting for guesses...
+            </Text>
+          )}
+        </>
       )}
     </VStack>
   );
