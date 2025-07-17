@@ -56,12 +56,13 @@ function RoomPage() {
 });
 
     socket.on('startRankingPhase', ({ judgeName }) => {
-      if (playerName === judgeName) {
-        navigate(`/judge/${roomCode}`);
-      } else {
-        navigate(`/guess/${roomCode}`);
-      }
-    });
+  console.log("🔔 Received startRankingPhase:", judgeName, "I am:", playerName);
+  if (playerName === judgeName) {
+    navigate(`/judge/${roomCode}`);
+  } else {
+    navigate(`/guess/${roomCode}`);
+  }
+});
 
     return () => {
       socket.off('playerJoined');
