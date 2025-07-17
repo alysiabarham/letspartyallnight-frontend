@@ -20,7 +20,8 @@ import {
   Button,
   Box,
   Text,
-  useToast
+  useToast,
+  Spinner
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -60,17 +61,19 @@ function GuesserRankingPage() {
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    socket.on('sendAllEntries', ({ entries }) => {
-      console.log('✅ Received entries from server:', entries);
+    socket.emit('requestEntries', { roomCode });
+
+    socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
+      console.log('✅ Received entries for guessing:', entries);
       setEntries(entries);
     });
 
-    socket.on('revealResults', ({ judgeRanking }) => {
+    socket.on('revealResults', ({ judgeRanking }: { judgeRanking: string[] }) => {
       setFinalRanking(judgeRanking);
       setResultsVisible(true);
       toast({
         title: 'Results revealed!',
-        description: 'Compare your guess to the Judge\'s final ranking.',
+        description: 'See how your guess compares to the Judge’s ranking.',
         status: 'info',
         duration: 6000,
         isClosable: true
@@ -81,7 +84,7 @@ function GuesserRankingPage() {
       socket.off('sendAllEntries');
       socket.off('revealResults');
     };
-  }, []);
+  }, [roomCode]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -99,8 +102,8 @@ function GuesserRankingPage() {
     });
     setSubmitted(true);
     toast({
-      title: 'Ranking submitted!',
-      description: 'Waiting for others...',
+      title: 'Guess submitted!',
+      description: 'Waiting for results...',
       status: 'success',
       duration: 4000,
       isClosable: true
@@ -113,20 +116,27 @@ function GuesserRankingPage() {
         <>
           <Heading size="lg" color="#FFFF00">Your Guess: Rank the Entries</Heading>
           <Text fontSize="md" fontStyle="italic">
-            Drag to arrange how you think the Judge ranked these.
+            Drag and drop the entries how you think the Judge ranked them.
           </Text>
 
-          <Box w="100%" maxW="400px">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={entries} strategy={verticalListSortingStrategy}>
-                <VStack spacing={3}>
-                  {entries.map((item, index) => (
-                    <SortableItem key={item} id={item} index={index} />
-                  ))}
-                </VStack>
-              </SortableContext>
-            </DndContext>
-          </Box>
+          {entries.length === 0 ? (
+            <Box pt={10} textAlign="center">
+              <Spinner size="lg" />
+              <Text pt={4}>Waiting for entries to appear...</Text>
+            </Box>
+          ) : (
+            <Box w="100%" maxW="400px">
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={entries} strategy={verticalListSortingStrategy}>
+                  <VStack spacing={3}>
+                    {entries.map((item, index) => (
+                      <SortableItem key={item} id={item} index={index} />
+                    ))}
+                  </VStack>
+                </SortableContext>
+              </DndContext>
+            </Box>
+          )}
 
           {!submitted && entries.length > 0 && (
             <Button colorScheme="green" onClick={handleSubmit}>
@@ -141,7 +151,7 @@ function GuesserRankingPage() {
         </>
       ) : (
         <>
-          <Heading size="lg" color="#FF00FF">Judge's Final Ranking</Heading>
+          <Heading size="lg" color="#FF00FF">Judge’s Final Ranking</Heading>
           <Box w="100%" maxW="400px">
             <VStack spacing={3}>
               {finalRanking.map((item, idx) => (
