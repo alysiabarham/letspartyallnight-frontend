@@ -25,7 +25,7 @@ import {
   Spinner
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 const socket = io(process.env.REACT_APP_SOCKET_URL!, {
@@ -54,45 +54,34 @@ const SortableItem = ({ id, index }: { id: string; index: number }) => {
 
 function JudgeRankingPage() {
   const { roomCode } = useParams();
-  const navigate = useNavigate();
   const [allEntries, setAllEntries] = useState<string[]>([]);
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const toast = useToast();
   const sensors = useSensors(useSensor(PointerSensor));
 
-  console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
-
   useEffect(() => {
+    console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
+
     socket.emit('requestEntries', { roomCode });
 
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
-  console.log("📦 Judge received entries:", entries);
-  if (!entries || entries.length === 0) {
-    console.log("❌ No entries received. Staying in loading state.");
-    return;
-  }
+      console.log("📦 Judge received entries:", entries);
 
-  const uniqueEntries = Array.from(new Set(entries));
-  const autoPick = uniqueEntries.slice(0, 5);
+      if (!entries || entries.length === 0) {
+        console.log("❌ No entries received. Staying in loading state.");
+        return;
+      }
 
-  setAllEntries(uniqueEntries);
-  setSelectedEntries(autoPick);
-});
+      const uniqueEntries = Array.from(new Set(entries));
+      const autoPick = uniqueEntries.slice(0, 5);
 
-    socket.on('revealResults', ({ judgeRanking }: { judgeRanking: string[] }) => {
-      toast({
-        title: 'Game Complete!',
-        description: 'Final ranking and guesses revealed!',
-        status: 'success',
-        duration: 5000,
-        isClosable: true
-      });
+      setAllEntries(uniqueEntries);
+      setSelectedEntries(autoPick);
     });
 
     return () => {
       socket.off('sendAllEntries');
-      socket.off('revealResults');
     };
   }, [roomCode]);
 
@@ -131,7 +120,6 @@ function JudgeRankingPage() {
     });
 
     setSubmitted(true);
-
     toast({
       title: 'Ranking submitted!',
       description: 'Waiting for guesses...',
@@ -139,10 +127,6 @@ function JudgeRankingPage() {
       duration: 4000,
       isClosable: true
     });
-
-    // Optional: redirect players to guessing phase
-    socket.emit('advanceToGuessingPhase', { roomCode });
-    navigate(`/guess/${roomCode}`);
   };
 
   return (
@@ -153,12 +137,11 @@ function JudgeRankingPage() {
       </Text>
 
       {allEntries.length === 0 ? (
-  <Box textAlign="center" pt={10}>
-    <Spinner size="lg" />
-    <Text pt={4}>Waiting for entries from players...</Text>
-  </Box>
-) : (
-  // actual ranking UI
+        <Box textAlign="center" pt={10}>
+          <Spinner size="lg" />
+          <Text pt={4}>Waiting for entries from players...</Text>
+        </Box>
+      ) : (
         <>
           {selectedEntries.map((entry, idx) => (
             <Box key={idx} w="100%" maxW="400px">
