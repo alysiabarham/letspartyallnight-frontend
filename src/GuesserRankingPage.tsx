@@ -62,6 +62,11 @@ function GuesserRankingPage() {
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
+    socket.emit('joinGameRoom', {
+        roomCode,
+        playerName
+    });
+
     socket.emit('requestEntries', { roomCode });
 
     socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
