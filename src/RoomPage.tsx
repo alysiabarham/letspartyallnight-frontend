@@ -62,7 +62,7 @@ function RoomPage() {
         navigate(`/judge/${roomCode}`);
       } else {
         console.log("🕵️ I am a guesser. Navigating to /guess");
-        navigate(`/guess/${roomCode}`);
+        navigate(`/guess/${roomCode}`, { state: { playerName } });
       }
     });
 
