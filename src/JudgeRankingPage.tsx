@@ -57,27 +57,29 @@ function JudgeRankingPage() {
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
+  console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
 
-    socket.on('sendAllEntries', ({ entries }: { entries: string[] }) => {
-      console.log("📦 Judge received entries:", entries);
+  const handleSendAllEntries = ({ entries }: { entries: string[] }) => {
+    console.log("📦 Judge received entries:", entries);
 
-      if (!entries || entries.length === 0) {
-        console.log("❌ No entries received. Staying in loading state.");
-        return;
-      }
+    if (!entries || entries.length === 0) {
+      console.log("❌ No entries received. Staying in loading state.");
+      return;
+    }
 
-      const uniqueEntries = Array.from(new Set(entries));
-      const autoPick = uniqueEntries.slice(0, 5);
+    const uniqueEntries = Array.from(new Set(entries));
+    const autoPick = uniqueEntries.slice(0, 5);
 
-      setAllEntries(uniqueEntries);
-      setSelectedEntries(autoPick);
-    });
+    setAllEntries(uniqueEntries);
+    setSelectedEntries(autoPick);
+  };
 
-    return () => {
-      socket.off('sendAllEntries');
-    };
-  }, [roomCode]);
+  socket.on('sendAllEntries', handleSendAllEntries);
+
+  return () => {
+    socket.off('sendAllEntries', handleSendAllEntries);
+  };
+}, [roomCode]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
