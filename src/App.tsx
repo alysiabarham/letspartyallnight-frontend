@@ -4,15 +4,23 @@ import { Box, Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { useEffect } from 'react';
 
 import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
-
+import socket from './socket';
 const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
-const socket = io(BACKEND_URL, {
-  withCredentials: true
-});
+
+useEffect(() => {
+  socket.on('sendAllEntries', ({ entries }) => {
+    console.log("📦 [Global] Received sendAllEntries:", entries);
+  });
+
+  return () => {
+    socket.off('sendAllEntries');
+  };
+}, []);
 
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
