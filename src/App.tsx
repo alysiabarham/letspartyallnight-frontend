@@ -10,17 +10,8 @@ import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
 import socket from './socket';
+
 const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
-
-useEffect(() => {
-  socket.on('sendAllEntries', ({ entries }) => {
-    console.log("📦 [Global] Received sendAllEntries:", entries);
-  });
-
-  return () => {
-    socket.off('sendAllEntries');
-  };
-}, []);
 
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
@@ -171,6 +162,16 @@ const LandingPageContent = () => {
 };
 
 function App() {
+  useEffect(() => {
+    socket.on('sendAllEntries', ({ entries }) => {
+      console.log("📦 [Global] Received sendAllEntries:", entries);
+    });
+
+    return () => {
+      socket.off('sendAllEntries');
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<LandingPageContent />} />
