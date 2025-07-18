@@ -24,7 +24,7 @@ import {
   Spinner
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import socket from './socket'; // ✅ shared instance
 
 const SortableItem = ({ id, index }: { id: string; index: number }) => {
@@ -49,10 +49,15 @@ const SortableItem = ({ id, index }: { id: string; index: number }) => {
 
 function GuesserRankingPage() {
   const { roomCode } = useParams();
+  const location = useLocation();
+  const playerName = location.state?.playerName || 'Guest';
+
   const [entries, setEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [resultsVisible, setResultsVisible] = useState(false);
   const [finalRanking, setFinalRanking] = useState<string[]>([]);
+  const [score, setScore] = useState(0);
+
   const toast = useToast();
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -70,11 +75,13 @@ function GuesserRankingPage() {
       setEntries(entries);
     });
 
-    socket.on('revealResults', ({ judgeRanking }: { judgeRanking: string[] }) => {
+    socket.on('revealResults', ({ judgeRanking, results }) => {
+      console.log('📊 Scoring results received:', results);
       setFinalRanking(judgeRanking);
+      setScore(results[playerName]?.score || 0);
       setResultsVisible(true);
       toast({
-        title: 'Results revealed!',
+        title: `Results revealed! You scored ${results[playerName]?.score || 0} points!`,
         description: 'See how your guess compares to the Judge’s ranking.',
         status: 'info',
         duration: 6000,
@@ -86,7 +93,7 @@ function GuesserRankingPage() {
       socket.off('sendAllEntries');
       socket.off('revealResults');
     };
-  }, [roomCode]);
+  }, [roomCode, playerName]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -116,6 +123,7 @@ function GuesserRankingPage() {
   const handleSubmit = () => {
     socket.emit('submitGuess', {
       roomCode,
+      playerName,
       guess: entries
     });
 
@@ -187,6 +195,9 @@ function GuesserRankingPage() {
               ))}
             </VStack>
           </Box>
+          <Text pt={4} fontSize="lg" fontWeight="bold" color="yellow.400">
+            Your Score: {score} / {finalRanking.length}
+          </Text>
         </>
       )}
     </VStack>
