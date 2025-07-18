@@ -26,11 +26,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
-
-const socket = io(process.env.REACT_APP_SOCKET_URL!, {
-  withCredentials: true
-});
+import socket from './socket';
 
 const SortableItem = ({ id, index }: { id: string; index: number }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
