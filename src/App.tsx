@@ -161,6 +161,16 @@ const LandingPageContent = () => {
 
 function App() {
   useEffect(() => {
+  socket.onAny((event, payload) => {
+    console.log(`📡 [Global] Received event: ${event}`, payload);
+  });
+
+  return () => {
+    socket.offAny();
+  };
+}, []);
+
+  useEffect(() => {
     socket.on('sendAllEntries', ({ entries }) => {
       console.log("📦 [Global] Received sendAllEntries:", entries);
     });
