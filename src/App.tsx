@@ -11,8 +11,6 @@ import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
 import socket from './socket';
 
-const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
-
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [playerNameInput, setPlayerNameInput] = useState('');
@@ -42,7 +40,7 @@ const LandingPageContent = () => {
 
     try {
       const hostId = playerNameInput.trim();
-      const response = await axios.post(`${BACKEND_URL}/create-room`, { hostId });
+      const response = await axios.post('https://letspartyallnight-backend.onrender.com/create-room', { hostId });
       const { roomCode } = response.data;
 
       toast({ title: "Room created!", description: `Code: ${roomCode}`, status: "success", duration: 5000, isClosable: true });
@@ -72,7 +70,7 @@ const LandingPageContent = () => {
 
     try {
       const playerId = playerNameInput.trim();
-      const response = await axios.post(`${BACKEND_URL}/join-room`, {
+      const response = await axios.post('https://letspartyallnight-backend.onrender.com/join-room', {
         roomCode: roomCodeInput,
         playerId
       });
