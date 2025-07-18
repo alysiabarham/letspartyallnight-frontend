@@ -59,6 +59,13 @@ function JudgeRankingPage() {
   useEffect(() => {
   console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
 
+  // ✅ Step 1: Join the backend room
+  socket.emit('joinGameRoom', {
+    roomCode,
+    playerName: 'Alysia' // use actual judge name if available
+  });
+
+  // ✅ Step 2: Listen for entries
   const handleSendAllEntries = ({ entries }: { entries: string[] }) => {
     console.log("📦 Judge received entries:", entries);
 
