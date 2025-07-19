@@ -34,6 +34,7 @@ function RoomPage() {
   const [judge, setJudge] = useState('');
   const [round, setRound] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
+  const [roundLimit, setRoundLimit] = useState(5); // ✅ NEW: controls total rounds
 
   useEffect(() => {
   socket.emit('joinGameRoom', {
@@ -90,12 +91,12 @@ function RoomPage() {
   }, [players, round, gameStarted]);
 
   const handleStartGame = () => {
-    socket.emit('gameStarted', {
-      roomCode,
-      category: 'Things That Are Overrated'
-    });
-    toast({ title: 'Game started!', status: 'success', duration: 3000, isClosable: true });
-  };
+  socket.emit('gameStarted', {
+    roomCode,
+    roundLimit
+  });
+  toast({ title: 'Game started!', status: 'success', duration: 3000, isClosable: true });
+};
 
   const handleEntrySubmit = () => {
     const trimmed = entryText.trim();
@@ -166,6 +167,23 @@ function RoomPage() {
           Start Game
         </Button>
       )}
+
+<Box>
+  <Text fontSize="md" mt={4} color="#FFFF00">Number of Rounds:</Text>
+  <Input
+    type="number"
+    value={roundLimit}
+    onChange={(e) => setRoundLimit(Number(e.target.value))}
+    min={1}
+    max={10}
+    w="100px"
+    mt={1}
+    borderColor="#FFFF00"
+    color="#FFFF00"
+    _placeholder={{ color: "#FFFF00", opacity: 0.6 }}
+    _focus={{ borderColor: "#FFFF00", boxShadow: "0 0 5px #FFFF00" }}
+  />
+</Box>
 
       {gameStarted && !isJudge && !isSpectator && !doneSubmitting && (
         <>
