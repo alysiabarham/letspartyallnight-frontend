@@ -52,7 +52,8 @@ function RoomPage() {
     socket.on('gameStarted', ({ category }) => {
       setGameStarted(true);
       setCategory(category);
-      setRound(1); // ✅ reset for each game
+      setDoneSubmitting(false);
+      setRound(prev => prev + 1); // or setRound(1) if this is the first time
     });
 
     socket.on('newEntry', ({ entry }) => {
@@ -100,37 +101,57 @@ function RoomPage() {
 };
 
   const handleEntrySubmit = () => {
-    const trimmed = entryText.trim();
-    if (!trimmed) {
-      toast({ title: 'Entry cannot be empty.', status: 'warning', duration: 3000, isClosable: true });
-      return;
-    }
+  const trimmed = entryText.trim();
+  const cleaned = trimmed.toLowerCase();
 
-    socket.emit('submitEntry', {
-      roomCode,
-      playerName,
-      entry: trimmed
-    });
-
-    setEntryText('');
+  if (!trimmed) {
     toast({
-      title: 'Entry submitted!',
-      description: `"${trimmed}" added.`,
-      status: 'success',
+      title: 'Entry cannot be empty.',
+      status: 'warning',
       duration: 3000,
       isClosable: true
     });
-  };
+    return;
+  }
 
-  const handleDoneSubmitting = () => {
-    setDoneSubmitting(true);
+  socket.emit('submitEntry', {
+    roomCode,
+    playerName,
+    entry: cleaned
+  });
+
+  setEntryText('');
+  toast({
+    title: 'Entry submitted!',
+    description: `"${trimmed}" added.`,
+    status: 'success',
+    duration: 3000,
+    isClosable: true
+  });
+};
+
+const handleDoneSubmitting = () => {
+const uniqueEntryCount = new Set(entries.map(e => e.toLowerCase())).size;
+
+  if (uniqueEntryCount < 5) {
     toast({
-      title: 'Marked as done submitting.',
-      status: 'info',
-      duration: 3000,
+      title: 'Not enough unique responses',
+      description: 'There must be at least 5 unique entries in the room before you can mark yourself as done.',
+      status: 'warning',
+      duration: 4000,
       isClosable: true
     });
-  };
+    return;
+  }
+
+  setDoneSubmitting(true);
+  toast({
+    title: 'Marked as done submitting.',
+    status: 'info',
+    duration: 3000,
+    isClosable: true
+  });
+};
 
   const handleAdvanceToRankingPhase = () => {
     if (entries.length < 5) {
