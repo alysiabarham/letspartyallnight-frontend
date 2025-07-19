@@ -126,21 +126,27 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
   };
 
   const handleSubmit = () => {
-    socket.emit('submitGuess', {
-      roomCode,
-      playerName,
-      guess: entries
-    });
+  console.log('📤 Emitting submitGuess:', {
+    roomCode,
+    playerName,
+    guess: entries
+  });
 
-    setSubmitted(true);
-    toast({
-      title: 'Guess submitted!',
-      description: 'Waiting for results...',
-      status: 'success',
-      duration: 4000,
-      isClosable: true
-    });
-  };
+  socket.emit('submitGuess', {
+    roomCode,
+    playerName,
+    guess: entries
+  });
+
+  setSubmitted(true);
+  toast({
+    title: 'Guess submitted!',
+    description: 'Waiting for results...',
+    status: 'success',
+    duration: 4000,
+    isClosable: true
+  });
+};
 
   return (
     <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
