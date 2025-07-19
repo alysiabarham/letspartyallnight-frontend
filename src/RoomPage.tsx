@@ -52,7 +52,7 @@ function RoomPage() {
     socket.on('gameStarted', ({ category }) => {
       setGameStarted(true);
       setCategory(category);
-      setRound(prev => prev + 1); // ✅ advance round locally
+      setRound(1); // ✅ reset for each game
     });
 
     socket.on('newEntry', ({ entry }) => {
@@ -168,28 +168,28 @@ function RoomPage() {
       {category && <Text fontStyle="italic">Category: {category}</Text>}
 
       {!gameStarted && isHost && (
-        <Button colorScheme="yellow" onClick={handleStartGame}>
-          Start Game
-        </Button>
-      )}
+  <>
+    <Box>
+      <Text fontSize="md" mt={4} color="#FFFF00">Number of Rounds:</Text>
+      <Input
+        type="number"
+        value={roundLimit}
+        onChange={(e) => setRoundLimit(Number(e.target.value))}
+        min={1}
+        max={10}
+        w="100px"
+        mt={1}
+        borderColor="#FFFF00"
+        color="#FFFF00"
+        _placeholder={{ color: "#FFFF00", opacity: 0.6 }}
+        _focus={{ borderColor: "#FFFF00", boxShadow: "0 0 5px #FFFF00" }}
+      />
+    </Box>
 
-{!gameStarted && isHost && (
-  <Box>
-    <Text fontSize="md" mt={4} color="#FFFF00">Number of Rounds:</Text>
-    <Input
-      type="number"
-      value={roundLimit}
-      onChange={(e) => setRoundLimit(Number(e.target.value))}
-      min={1}
-      max={10}
-      w="100px"
-      mt={1}
-      borderColor="#FFFF00"
-      color="#FFFF00"
-      _placeholder={{ color: "#FFFF00", opacity: 0.6 }}
-      _focus={{ borderColor: "#FFFF00", boxShadow: "0 0 5px #FFFF00" }}
-    />
-  </Box>
+    <Button colorScheme="yellow" mt={4} onClick={handleStartGame}>
+      Start Game
+    </Button>
+  </>
 )}
 
       {gameStarted && !isJudge && !isSpectator && !doneSubmitting && (
