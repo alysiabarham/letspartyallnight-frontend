@@ -36,10 +36,12 @@ function RoomPage() {
   const [gameStarted, setGameStarted] = useState(false);
 
   useEffect(() => {
-    socket.emit('joinGameRoom', {
-      roomCode,
-      playerName
-    });
+  socket.emit('joinGameRoom', {
+    roomCode,
+    playerName
+  });
+
+  localStorage.setItem('playerName', playerName);
 
     socket.on('playerJoined', ({ players }: { players: { id: string; name: string }[] }) => {
       const names = players.map(p => p.name);

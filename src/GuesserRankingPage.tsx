@@ -50,7 +50,7 @@ const SortableItem = ({ id, index }: { id: string; index: number }) => {
 function GuesserRankingPage() {
   const { roomCode } = useParams();
   const location = useLocation();
-  const playerName = location.state?.playerName || 'Guest';
+const [playerName] = useState(location.state?.playerName || localStorage.getItem('playerName') || 'Guest');
 
   const [entries, setEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
