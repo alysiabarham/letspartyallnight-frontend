@@ -114,6 +114,18 @@ function JudgeRankingPage() {
       });
       return;
     }
+    
+const hasDuplicates = new Set(selectedEntries).size !== selectedEntries.length;
+if (hasDuplicates) {
+  toast({
+    title: 'Duplicate entries detected!',
+    description: 'Please re-select any repeated items. Drag-and-drop only works with unique entries.',
+    status: 'warning',
+    duration: 5000,
+    isClosable: true
+  });
+  return;
+}
 
     console.log("✅ Submitting final ranking to server:", selectedEntries);
 
