@@ -58,6 +58,7 @@ function JudgeRankingPage() {
   const [submitted, setSubmitted] = useState(false);
   const toast = useToast();
   const sensors = useSensors(useSensor(PointerSensor));
+  const [category, setCategory] = useState('');
 
   useEffect(() => {
   console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
@@ -79,6 +80,18 @@ function JudgeRankingPage() {
     }
 
     const uniqueEntries = Array.from(new Set(entries));
+    if (uniqueEntries.length < 5) {
+        toast({
+            title: 'Duplicate entries detected!',
+            description: 'Too few unique responses. Please wait until all players submit distinct answers.',
+            status: 'error',
+         duration: 6000,
+            isClosable: true,
+        });
+        setAllEntries([]);
+        setSelectedEntries([]);
+        return;
+    }
     const autoPick = uniqueEntries.slice(0, 5);
 
     setAllEntries(uniqueEntries);
