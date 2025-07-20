@@ -57,11 +57,13 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
   const [entries, setEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [resultsVisible, setResultsVisible] = useState(false);
+  const [category, setCategory] = useState('');
   const [finalRanking, setFinalRanking] = useState<string[]>([]);
   const [score, setScore] = useState(0);
 
   const toast = useToast();
   const sensors = useSensors(useSensor(PointerSensor));
+  
 
   useEffect(() => {
     socket.emit('joinGameRoom', {
@@ -81,6 +83,10 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
 
       setEntries(entries);
     });
+
+    socket.on('gameStarted', ({ category }) => {
+        setCategory(category);
+     });
 
     socket.on('revealResults', ({ judgeRanking, results }) => {
       console.log('📊 Scoring results received:', results);
@@ -162,6 +168,12 @@ useEffect(() => {
 
   return (
     <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
+      {!resultsVisible && (
+         <Heading size="md" color="yellow.200">
+          Round Topic: {category}
+         </Heading>
+        )}
+
       {!resultsVisible ? (
         <>
           <Heading size="lg" color="#FFFF00">Your Guess: Rank the Entries</Heading>
