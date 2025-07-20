@@ -49,12 +49,12 @@ function RoomPage() {
       setPlayers(names);
     });
 
-    socket.on('gameStarted', ({ category }) => {
-      setRound((r) => r + 1); // or use the round from backend if sent
+    socket.on('gameStarted', ({ category, round }) => {
+      console.log("🧠 New round started:", round);
+      setRound(round);
       setGameStarted(true);
       setCategory(category);
       setDoneSubmitting(false);
-      setRound(prev => prev + 1); // or setRound(1) if this is the first time
     });
 
     socket.on('newEntry', ({ entry }) => {
@@ -71,7 +71,16 @@ function RoomPage() {
         navigate(`/guess/${roomCode}`, { state: { playerName } });
       }
     });
-
+    socket.on('roomState', ({ phase, judgeName }) => {
+      console.log("🩺 Resyncing from roomState:", { phase, judgeName });
+      if (phase === 'ranking') {
+        if (playerName === judgeName) {
+          navigate(`/judge/${roomCode}`, { state: { playerName } });
+        } else {
+          navigate(`/guess/${roomCode}`, { state: { playerName } });
+        }
+      }
+    });
     return () => {
       socket.off('playerJoined');
       socket.off('gameStarted');
