@@ -66,11 +66,21 @@ function JudgeRankingPage() {
         setCategory(category);
     });
 
+    socket.on('roomState', ({ phase, players, judgeName }) => {
+        console.log("🧭 Received room state:", { phase, judgeName });
+        if (phase === 'ranking' && judgeName === playerName) {
+         socket.emit('requestEntries', { roomCode });
+        }
+        });
+
   // ✅ Step 1: Join the backend room
   socket.emit('joinGameRoom', {
     roomCode,
     playerName
 });
+
+// 🧠 Re-request entries if judge refreshes mid-round
+socket.emit('requestEntries', { roomCode });
 
   // ✅ Step 2: Listen for entries
   const handleSendAllEntries = ({ entries }: { entries: string[] }) => {
@@ -85,17 +95,17 @@ function JudgeRankingPage() {
     const uniqueEntries = Array.from(new Set(entries));
     if (uniqueEntries.length < 5) {
         toast({
-            title: 'Not enough unique entries',
-            description: 'The Judge cannot rank duplicates. Please wait until all players submit distinct answers.',
+            title: 'Duplicate entries detected',
+            description: 'The Judge cannot rank duplicates. Please refresh after players submit better responses.',
             status: 'error',
             duration: 6000,
             isClosable: true,
         });
-
         setAllEntries([]);
         setSelectedEntries([]);
         return;
-    }
+     }
+   
     const autoPick = uniqueEntries.slice(0, 5);
 
     setAllEntries(uniqueEntries);
@@ -134,16 +144,16 @@ function JudgeRankingPage() {
   };
 
   const handleSubmit = () => {
-    if (selectedEntries.length < 5 || new Set(selectedEntries).size < 5) {
-      toast({
-        title: 'Need 5 unique entries',
-        description: 'Duplicate items detected—please fix before submitting.',
-        status: 'error',
-        duration: 4000,
-        isClosable: true
-      });
-      return;
-    }
+    if (new Set(selectedEntries).size < selectedEntries.length) {
+  toast({
+    title: 'Duplicate detected!',
+    description: 'Re-rank with 5 unique entries to continue.',
+    status: 'warning',
+    duration: 5000,
+    isClosable: true,
+  });
+  return;
+}
 
 const hasDuplicates = new Set(selectedEntries).size !== selectedEntries.length;
 if (hasDuplicates) {
@@ -180,6 +190,9 @@ if (hasDuplicates) {
       <Text fontSize="md" fontStyle="italic">
         Select 5 unique responses and drag to rank them.
       </Text>
+      {category && (
+       <Heading size="md" color="yellow.200">Round Topic: {category}</Heading>
+       )}
 
       {allEntries.length === 0 ? (
         <Box textAlign="center" pt={10}>
