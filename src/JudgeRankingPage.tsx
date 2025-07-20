@@ -66,12 +66,15 @@ function JudgeRankingPage() {
         setCategory(category);
     });
 
-    socket.on('roomState', ({ phase, players, judgeName }) => {
-        console.log("🧭 Received room state:", { phase, judgeName });
-        if (phase === 'ranking' && judgeName === playerName) {
-         socket.emit('requestEntries', { roomCode });
-        }
-        });
+    socket.on('roomState', ({ phase, judgeName, category }) => {
+            console.log("🧠 Received roomState:", { phase, judgeName });
+            if (category) {
+                setCategory(category);
+            }
+            if (phase === 'ranking') {
+                socket.emit('requestEntries', { roomCode });
+            }
+            });
 
   // ✅ Step 1: Join the backend room
   socket.emit('joinGameRoom', {
@@ -103,6 +106,7 @@ socket.emit('requestEntries', { roomCode });
         });
         setAllEntries([]);
         setSelectedEntries([]);
+        setSubmitted(false); // ✅ reset any stale state
         return;
      }
    
