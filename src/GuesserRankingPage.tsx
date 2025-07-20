@@ -26,6 +26,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import socket from './socket'; // ✅ shared instance
+import { useNavigate } from 'react-router-dom';
 
 const SortableItem = ({ id, index }: { id: string; index: number }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -50,6 +51,7 @@ const SortableItem = ({ id, index }: { id: string; index: number }) => {
 function GuesserRankingPage() {
   const { roomCode } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 const [playerName] = useState(location.state?.playerName || localStorage.getItem('playerName') || 'Guest');
 
   const [entries, setEntries] = useState<string[]>([]);
@@ -99,6 +101,16 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
       socket.off('revealResults');
     };
   }, [roomCode, playerName]);
+
+useEffect(() => {
+  socket.on('playerJoined', ({ players }) => {
+    const current = players.find((p: { name: string; hasGuessed?: boolean }) => p.name === playerName);
+    if (current?.hasGuessed) {
+      console.log("🛑 Already guessed—redirecting to results.");
+      navigate(`/results/${roomCode}`);
+    }
+  });
+}, [playerName]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
