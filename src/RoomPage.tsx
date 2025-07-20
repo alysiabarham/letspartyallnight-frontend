@@ -103,6 +103,17 @@ function RoomPage() {
   const handleEntrySubmit = () => {
   const trimmed = entryText.trim();
   const cleaned = trimmed.toLowerCase();
+  const isAlphanumeric = /^[a-zA-Z0-9 ]+$/.test(cleaned);
+if (!isAlphanumeric) {
+  toast({
+    title: 'Invalid entry',
+    description: 'Please use only letters, numbers, and spaces—no punctuation or symbols.',
+    status: 'error',
+    duration: 4000,
+    isClosable: true
+  });
+  return;
+}
 
   if (!trimmed) {
     toast({
