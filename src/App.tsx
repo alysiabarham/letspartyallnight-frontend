@@ -186,6 +186,8 @@ function App() {
       <Route path="/room/:roomCode" element={<RoomPage />} />
       <Route path="/judge/:roomCode" element={<JudgeRankingPage />} />
       <Route path="/guess/:roomCode" element={<GuesserRankingPage />} />
+      <Route path="/results/:roomCode" element={<ResultsPage />} />
+      navigate(`/results/${roomCode}`); // ✅ after checking hasGuessed
     </Routes>
   );
 }

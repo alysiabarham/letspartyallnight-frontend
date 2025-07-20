@@ -207,6 +207,7 @@ const uniqueEntryCount = new Set(entries.map(e => e.toLowerCase())).size;
       <Text fontSize="xl">Welcome, {playerName}!</Text>
       {host && <Text>Host: {host}</Text>}
       {judge && <Text>Judge this round: <strong>{judge}</strong></Text>}
+      <Text>Phase: <strong>{gameStarted ? 'entry' : 'waiting to start'}</strong></Text>
       {category && <Text fontStyle="italic">Category: {category}</Text>}
 
       {!gameStarted && isHost && (
