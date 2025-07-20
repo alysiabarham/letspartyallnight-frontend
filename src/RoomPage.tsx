@@ -64,7 +64,7 @@ function RoomPage() {
       console.log("🔔 Received startRankingPhase. Judge is:", judgeName, "I am:", playerName);
       if (playerName === judgeName) {
         console.log("✅ I am the Judge. Navigating to /judge");
-        navigate(`/judge/${roomCode}`);
+        navigate(`/judge/${roomCode}`, { state: { playerName } });
       } else {
         console.log("🕵️ I am a guesser. Navigating to /guess");
         navigate(`/guess/${roomCode}`, { state: { playerName } });
