@@ -67,7 +67,8 @@ function JudgeRankingPage() {
 
   // ✅ Step 2: Listen for entries
   const handleSendAllEntries = ({ entries }: { entries: string[] }) => {
-    console.log("📦 Judge received entries:", entries);
+    console.log("📦 Judge received entries:", entries); // ✅ already exists!
+    console.log("🟢 Entries received in JudgeRankingPage:", entries); // ✅ extra confirmation
 
     if (!entries || entries.length === 0) {
       console.log("❌ No entries received. Staying in loading state.");
@@ -114,7 +115,7 @@ function JudgeRankingPage() {
       });
       return;
     }
-    
+
 const hasDuplicates = new Set(selectedEntries).size !== selectedEntries.length;
 if (hasDuplicates) {
   toast({
