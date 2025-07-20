@@ -70,6 +70,13 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
         roomCode,
         playerName
     });
+    socket.on('roomState', ({ phase, judgeName }) => {
+        console.log("🧠 Received roomState:", { phase, judgeName });
+        if (phase === 'ranking') {
+            socket.emit('requestEntries', { roomCode });
+        }
+    });
+
     socket.on('gameStarted', (payload: { category: string }) => {
         setCategory(payload.category);
         });
@@ -170,16 +177,11 @@ useEffect(() => {
 };
 
   return (
-    <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
+    <VStack spacing={6} p={8} bg="#1100ffff" minH="100vh" color="white">
         {category && (
-         <Heading size="md" color="yellow.200">
-             Round Topic: {category}
-         </Heading>
-        )}
-      {!resultsVisible && (
-         <Heading size="md" color="yellow.200">
-          Round Topic: {category}
-         </Heading>
+            <Heading size="md" color="yellow.200">
+                Round Topic: {category}
+            </Heading>
         )}
 
       {!resultsVisible ? (
