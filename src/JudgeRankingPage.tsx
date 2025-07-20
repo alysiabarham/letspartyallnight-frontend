@@ -105,6 +105,15 @@ function JudgeRankingPage() {
     const updated = [...selectedEntries];
     updated[index] = newValue;
     setSelectedEntries(updated);
+    if (new Set(updated).size !== updated.length) {
+  toast({
+    title: 'Duplicate detected!',
+    description: 'Try picking a different response.',
+    status: 'error',
+    duration: 4000,
+    isClosable: true
+  });
+}
   };
 
   const handleSubmit = () => {
