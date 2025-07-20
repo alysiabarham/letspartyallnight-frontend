@@ -27,6 +27,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import socket from './socket'; // ✅ shared instance
+import { useLocation } from 'react-router-dom';
 
 const SortableItem = ({ id, index }: { id: string; index: number }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -50,6 +51,8 @@ const SortableItem = ({ id, index }: { id: string; index: number }) => {
 
 function JudgeRankingPage() {
   const { roomCode } = useParams();
+  const location = useLocation();
+  const playerName = location.state?.playerName || 'Unknown';
   const [allEntries, setAllEntries] = useState<string[]>([]);
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -62,8 +65,8 @@ function JudgeRankingPage() {
   // ✅ Step 1: Join the backend room
   socket.emit('joinGameRoom', {
     roomCode,
-    playerName: 'Alysia' // use actual judge name if available
-  });
+    playerName
+});
 
   // ✅ Step 2: Listen for entries
   const handleSendAllEntries = ({ entries }: { entries: string[] }) => {
