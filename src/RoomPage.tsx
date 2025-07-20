@@ -50,6 +50,7 @@ function RoomPage() {
     });
 
     socket.on('gameStarted', ({ category }) => {
+      setRound((r) => r + 1); // or use the round from backend if sent
       setGameStarted(true);
       setCategory(category);
       setDoneSubmitting(false);

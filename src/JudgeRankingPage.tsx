@@ -62,6 +62,9 @@ function JudgeRankingPage() {
 
   useEffect(() => {
   console.log("🧭 JudgeRankingPage mounted. Room code:", roomCode);
+    socket.on('gameStarted', ({ category }) => {
+        setCategory(category);
+    });
 
   // ✅ Step 1: Join the backend room
   socket.emit('joinGameRoom', {
@@ -82,12 +85,13 @@ function JudgeRankingPage() {
     const uniqueEntries = Array.from(new Set(entries));
     if (uniqueEntries.length < 5) {
         toast({
-            title: 'Duplicate entries detected!',
-            description: 'Too few unique responses. Please wait until all players submit distinct answers.',
+            title: 'Not enough unique entries',
+            description: 'The Judge cannot rank duplicates. Please wait until all players submit distinct answers.',
             status: 'error',
-         duration: 6000,
+            duration: 6000,
             isClosable: true,
         });
+
         setAllEntries([]);
         setSelectedEntries([]);
         return;
