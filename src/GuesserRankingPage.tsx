@@ -72,6 +72,7 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
     });
     socket.on('roomState', ({ phase, judgeName, category }) => {
         console.log("🧠 Received roomState:", { phase, judgeName });
+        console.log(`🩺 Phase check inside GuesserRankingPage: ${phase}`);
         if (category) {
             setCategory(category);
         }
@@ -114,6 +115,10 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
         isClosable: true
       });
     });
+
+    if (entries.length === 0) {
+        socket.emit('requestEntries', { roomCode });
+    }
 
     return () => {
       socket.off('sendAllEntries');
@@ -194,7 +199,7 @@ useEffect(() => {
             Drag and drop the entries how you think the Judge ranked them.
           </Text>
 
-          {entries.length === 0 ? (
+          {entries.length < 1 ? (
             <Box pt={10} textAlign="center">
               <Spinner size="lg" />
               <Text pt={4}>Waiting for Judge’s selected entries...</Text>
