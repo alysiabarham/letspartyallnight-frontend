@@ -174,6 +174,13 @@ const uniqueEntryCount = new Set(entries.map(e => e.toLowerCase())).size;
   });
 };
 
+useEffect(() => {
+  if (!entries || entries.length === 0) {
+    console.log("❓ No entries received, re-requesting...");
+    socket.emit('requestEntries', { roomCode });
+  }
+}, [entries]);
+
   const handleAdvanceToRankingPhase = () => {
     if (entries.length < 5) {
       toast({
