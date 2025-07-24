@@ -56,6 +56,7 @@ function JudgeRankingPage() {
   const [allEntries, setAllEntries] = useState<string[]>([]);
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [dragDisabled, setDragDisabled] = useState(false);
   const toast = useToast();
   const sensors = useSensors(useSensor(PointerSensor));
   const [category, setCategory] = useState('');
@@ -67,14 +68,14 @@ function JudgeRankingPage() {
     });
 
     socket.on('roomState', ({ phase, judgeName, category }) => {
-            console.log("🧠 Received roomState:", { phase, judgeName });
-            if (category) {
-                setCategory(category);
-            }
-            if (phase === 'ranking') {
-                socket.emit('requestEntries', { roomCode });
-            }
-            });
+        console.log("🧠 Received roomState:", { phase, judgeName });
+        if (category) {
+            setCategory(category);
+        }
+        if (phase === 'ranking') {
+            socket.emit('requestEntries', { roomCode });
+        }
+        });
 
   // ✅ Step 1: Join the backend room
   socket.emit('joinGameRoom', {
@@ -96,6 +97,8 @@ socket.emit('requestEntries', { roomCode });
     }
 
     const uniqueEntries = Array.from(new Set(entries));
+    const autoPick = uniqueEntries.slice(0, 5);
+    
     if (uniqueEntries.length < 5) {
         toast({
             title: 'Duplicate entries detected',
@@ -104,14 +107,13 @@ socket.emit('requestEntries', { roomCode });
             duration: 6000,
             isClosable: true,
         });
-        setAllEntries([]);
-        setSelectedEntries([]);
         setSubmitted(false); // ✅ reset any stale state
+        setAllEntries(uniqueEntries);
+        setSelectedEntries(autoPick);
+        setDragDisabled(false); // ✅ re-enable drag
         return;
      }
    
-    const autoPick = uniqueEntries.slice(0, 5);
-
     setAllEntries(uniqueEntries);
     setSelectedEntries(autoPick);
   };
@@ -189,41 +191,49 @@ if (hasDuplicates) {
   };
 
   return (
-    <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
-      <Heading size="lg" color="#FF00FF">Judge Mode: Choose & Rank Top 5</Heading>
-      <Text fontSize="md" fontStyle="italic">
-        Select 5 unique responses and drag to rank them.
-      </Text>
-      {category && (
-       <Heading size="md" color="yellow.200">Round Topic: {category}</Heading>
-       )}
+  <VStack spacing={6} p={8} bg="#0F3460" minH="100vh" color="white">
+    <Heading size="lg" color="#FF00FF">Judge Mode: Choose & Rank Top 5</Heading>
+    <Text fontSize="md" fontStyle="italic">
+      Select 5 unique responses and drag to rank them.
+    </Text>
 
-      {allEntries.length === 0 ? (
-        <Box textAlign="center" pt={10}>
-          <Spinner size="lg" />
-          <Text pt={4}>Waiting for entries from players...</Text>
-        </Box>
-      ) : (
-        <>
-          {selectedEntries.map((entry, idx) => (
-            <Box key={idx} w="100%" maxW="400px">
-              <Text color="gray.300">Slot #{idx + 1}</Text>
-              <Select
-                value={entry}
-                onChange={(e) => handleSwap(idx, e.target.value)}
-                bg="#16213E"
-                color="white"
-                borderColor="#FF00FF"
-              >
-                {allEntries.map((opt, i) => (
-                  <option key={i} value={opt}>{opt}</option>
-                ))}
-              </Select>
-            </Box>
-          ))}
+    {/* 🧠 Optional: Show round category if available */}
+    {category && (
+      <Heading size="md" color="yellow.200">Round Topic: {category}</Heading>
+    )}
 
-          <Heading size="md" color="yellow.300" pt={6}>Drag to Set Final Order</Heading>
+    {/* 🌀 Waiting for player entries */}
+    {allEntries.length === 0 ? (
+      <Box textAlign="center" pt={10}>
+        <Spinner size="lg" />
+        <Text pt={4}>Waiting for entries from players...</Text>
+      </Box>
+    ) : (
+      <>
+        {/* 🔢 Dropdowns for choosing top 5 */}
+        {selectedEntries.map((entry, idx) => (
+          <Box key={idx} w="100%" maxW="400px">
+            <Text color="gray.300">Slot #{idx + 1}</Text>
+            <Select
+              value={entry}
+              onChange={(e) => handleSwap(idx, e.target.value)}
+              bg="#16213E"
+              color="white"
+              borderColor="#FF00FF"
+            >
+              {allEntries.map((opt, i) => (
+                <option key={i} value={opt}>{opt}</option>
+              ))}
+            </Select>
+          </Box>
+        ))}
 
+        {/* 🪄 Drag-and-drop zone */}
+        <Heading size="md" color="yellow.300" pt={6}>
+          Drag to Set Final Order
+        </Heading>
+
+        {!dragDisabled && (
           <Box w="100%" maxW="400px">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={selectedEntries} strategy={verticalListSortingStrategy}>
@@ -234,22 +244,24 @@ if (hasDuplicates) {
                 </VStack>
               </SortableContext>
             </DndContext>
-          </Box>
 
-          {!submitted && (
-            <Button colorScheme="green" onClick={handleSubmit}>
-              Submit Final Ranking
-            </Button>
-          )}
-          {submitted && (
-            <Text fontSize="md" color="green.300">
-              Ranking submitted. Waiting for guesses...
-            </Text>
-          )}
-        </>
-      )}
-    </VStack>
-  );
+            {/* ✅ Submission states */}
+            {!submitted && (
+              <Button colorScheme="green" onClick={handleSubmit}>
+                Submit Final Ranking
+              </Button>
+            )}
+            {submitted && (
+              <Text fontSize="md" color="green.300">
+                Ranking submitted. Waiting for guesses...
+              </Text>
+            )}
+          </Box>
+        )}
+      </>
+    )}
+  </VStack>
+);
 }
 
 export default JudgeRankingPage;

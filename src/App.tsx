@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
+import ResultsPage from './ResultsPage';
 import socket from './socket';
 
 const LandingPageContent = () => {
@@ -186,8 +187,8 @@ function App() {
       <Route path="/room/:roomCode" element={<RoomPage />} />
       <Route path="/judge/:roomCode" element={<JudgeRankingPage />} />
       <Route path="/guess/:roomCode" element={<GuesserRankingPage />} />
+      // eslint-disable-next-line react/jsx-no-undef
       <Route path="/results/:roomCode" element={<ResultsPage />} />
-      navigate(`/results/${roomCode}`); // ✅ after checking hasGuessed
     </Routes>
   );
 }
