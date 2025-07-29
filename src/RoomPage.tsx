@@ -13,6 +13,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
+import axios from 'axios';
 
 const socket = io(process.env.REACT_APP_SOCKET_URL!, {
   withCredentials: true
@@ -37,12 +38,32 @@ function RoomPage() {
   const [roundLimit, setRoundLimit] = useState(5); // ✅ NEW: controls total rounds
 
   useEffect(() => {
-  socket.emit('joinGameRoom', {
-    roomCode,
-    playerName
-  });
+  const handleJoinRoom = async () => {
+    const safeName = playerName.trim().replace(/[^a-zA-Z0-9]/g, '');
+    if (!safeName || safeName.length > 20) {
+      toast({ title: 'Name must be alphanumeric & under 20 chars.', status: 'error' });
+      return;
+    }
 
-  localStorage.setItem('playerName', playerName);
+    try {
+      const response = await axios.post('/join-room', {
+        roomCode,
+        playerId: safeName
+      });
+
+      socket.emit('joinGameRoom', {
+        roomCode,
+        playerName: safeName
+      });
+      toast({ title: 'Joined room!', status: 'success' });
+
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Something went wrong while joining.';
+      toast({ title: 'Join failed', description: message, status: 'error' });
+    }
+
+    localStorage.setItem('playerName', playerName);
 
     socket.on('playerJoined', ({ players }: { players: { id: string; name: string }[] }) => {
       const names = players.map(p => p.name);
@@ -71,6 +92,7 @@ function RoomPage() {
         navigate(`/guess/${roomCode}`, { state: { playerName } });
       }
     });
+
     socket.on('roomState', ({ phase, judgeName }) => {
       console.log("🩺 Resyncing from roomState:", { phase, judgeName });
       if (phase === 'ranking') {
@@ -81,14 +103,17 @@ function RoomPage() {
         }
       }
     });
-    return () => {
-      socket.off('playerJoined');
-      socket.off('gameStarted');
-      socket.off('newEntry');
-      socket.off('startRankingPhase');
-    };
-  }, [roomCode, playerName, navigate]);
+  };
 
+  handleJoinRoom(); // 👈 Don’t forget to call it!
+
+  return () => {
+    socket.off('playerJoined');
+    socket.off('gameStarted');
+    socket.off('newEntry');
+    socket.off('startRankingPhase');
+  };
+}, [roomCode, playerName, navigate]);
   useEffect(() => {
     if (players.length > 0 && !host) {
       setHost(players[0]);
