@@ -49,10 +49,12 @@ function RoomPage() {
     }
 
     try {
-  const response = await axios.post('/join-room', {
-    roomCode,
-    playerId: safeName
-  });
+  const response = await axios.post('https://letspartyallnight-backend.onrender.com/join-room', {
+  roomCode,
+  playerId: safeName
+}, {
+  withCredentials: true
+});
 
   if (response.status === 200 || response.status === 201) {
     toast({ title: 'Room joined!', status: 'success' });
@@ -85,45 +87,6 @@ function RoomPage() {
 
     localStorage.setItem('playerName', playerName);
 
-    socket.on('playerJoined', ({ players }: { players: { id: string; name: string }[] }) => {
-      const names = players.map(p => p.name);
-      setPlayers(names);
-    });
-
-    socket.on('gameStarted', ({ category, round }) => {
-      console.log("🧠 New round started:", round);
-      setRound(round);
-      setGameStarted(true);
-      setCategory(category);
-      setDoneSubmitting(false);
-      setPhase('entry');
-    });
-
-    socket.on('newEntry', ({ entry }) => {
-      setEntries(prev => [...prev, entry]);
-    });
-
-    socket.on('startRankingPhase', ({ judgeName }) => {
-      console.log("🔔 Received startRankingPhase. Judge is:", judgeName, "I am:", playerName);
-      if (playerName === judgeName) {
-        console.log("✅ I am the Judge. Navigating to /judge");
-        navigate(`/judge/${roomCode}`, { state: { playerName } });
-      } else {
-        console.log("🕵️ I am a guesser. Navigating to /guess");
-        navigate(`/guess/${roomCode}`, { state: { playerName } });
-      }
-    });
-
-    socket.on('roomState', ({ phase, judgeName }) => {
-      console.log("🩺 Resyncing from roomState:", { phase, judgeName });
-      if (phase === 'ranking') {
-        if (playerName === judgeName) {
-          navigate(`/judge/${roomCode}`, { state: { playerName } });
-        } else {
-          navigate(`/guess/${roomCode}`, { state: { playerName } });
-        }
-      }
-    });
   };
 
   handleJoinRoom();
