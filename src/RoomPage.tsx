@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
+import { AxiosError } from 'axios';
 
 const socket = io(process.env.REACT_APP_SOCKET_URL!, {
   withCredentials: true
@@ -35,6 +36,7 @@ function RoomPage() {
   const [judge, setJudge] = useState('');
   const [round, setRound] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
+  const [phase, setPhase] = useState<'waiting' | 'entry' | 'ranking'>('waiting');
   const [roundLimit, setRoundLimit] = useState(5); // ✅ NEW: controls total rounds
 
   useEffect(() => {
@@ -46,22 +48,39 @@ function RoomPage() {
     }
 
     try {
-      const response = await axios.post('/join-room', {
-        roomCode,
-        playerId: safeName
-      });
+  const response = await axios.post('/join-room', {
+    roomCode,
+    playerId: safeName
+  });
 
-      socket.emit('joinGameRoom', {
-        roomCode,
-        playerName: safeName
-      });
-      toast({ title: 'Joined room!', status: 'success' });
+  if (response.status === 200 || response.status === 201) {
+    toast({ title: 'Room joined!', status: 'success' });
+    setPhase('waiting');
+    socket.emit('joinGameRoom', { roomCode, playerName: safeName });
+  } else {
+    toast({ title: 'Join failed', description: 'Unexpected status code.', status: 'error' });
+  }
+} catch (error: unknown) {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError;
 
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Something went wrong while joining.';
-      toast({ title: 'Join failed', description: message, status: 'error' });
+    if (axiosError.response?.status === 409) {
+      toast({ title: 'Name already taken.', status: 'error' });
+    } else {
+      toast({
+        title: 'Join failed',
+        description: axiosError.message,
+        status: 'error'
+      });
     }
+  } else {
+    toast({
+      title: 'Join failed',
+      description: 'An unknown error occurred.',
+      status: 'error'
+    });
+  }
+}
 
     localStorage.setItem('playerName', playerName);
 
@@ -76,6 +95,7 @@ function RoomPage() {
       setGameStarted(true);
       setCategory(category);
       setDoneSubmitting(false);
+      setPhase('entry');
     });
 
     socket.on('newEntry', ({ entry }) => {
@@ -239,7 +259,7 @@ useEffect(() => {
       <Text fontSize="xl">Welcome, {playerName}!</Text>
       {host && <Text>Host: {host}</Text>}
       {judge && <Text>Judge this round: <strong>{judge}</strong></Text>}
-      <Text>Phase: <strong>{gameStarted ? 'entry' : 'waiting to start'}</strong></Text>
+      <Text>Phase: <strong>{phase}</strong></Text>
       {category && <Text fontStyle="italic">Category: {category}</Text>}
 
       {!gameStarted && isHost && (
