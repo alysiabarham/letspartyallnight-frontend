@@ -16,7 +16,8 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import { AxiosError } from 'axios';
 
-const socket = io(process.env.REACT_APP_SOCKET_URL!, {
+const socket = io('https://letspartyallnight-backend.onrender.com', {
+  transports: ['websocket'],
   withCredentials: true
 });
 
