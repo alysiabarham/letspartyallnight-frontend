@@ -125,7 +125,7 @@ function RoomPage() {
     });
   };
 
-  handleJoinRoom(); // 👈 Don’t forget to call it!
+  handleJoinRoom();
 
   return () => {
     socket.off('playerJoined');
@@ -133,12 +133,62 @@ function RoomPage() {
     socket.off('newEntry');
     socket.off('startRankingPhase');
   };
-}, [roomCode, playerName, navigate]);
+}, []);
   useEffect(() => {
     if (players.length > 0 && !host) {
       setHost(players[0]);
     }
   }, [players, host]);
+  
+useEffect(() => {
+  socket.on('playerJoined', ({ players }: { players: { id: string; name: string }[] }) => {
+    const names = players.map(p => p.name);
+    setPlayers(names);
+  });
+
+  socket.on('gameStarted', ({ category, round }) => {
+    console.log("🧠 New round started:", round);
+    setRound(round);
+    setGameStarted(true);
+    setCategory(category);
+    setDoneSubmitting(false);
+    setPhase('entry');
+  });
+
+  socket.on('newEntry', ({ entry }) => {
+    setEntries(prev => [...prev, entry]);
+  });
+
+  socket.on('startRankingPhase', ({ judgeName }) => {
+    console.log("🔔 Received startRankingPhase. Judge is:", judgeName, "I am:", playerName);
+    if (playerName === judgeName) {
+      console.log("✅ I am the Judge. Navigating to /judge");
+      navigate(`/judge/${roomCode}`, { state: { playerName } });
+    } else {
+      console.log("🕵️ I am a guesser. Navigating to /guess");
+      navigate(`/guess/${roomCode}`, { state: { playerName } });
+    }
+  });
+
+  socket.on('roomState', ({ phase, judgeName }) => {
+    console.log("🩺 Resyncing from roomState:", { phase, judgeName });
+    if (phase === 'ranking') {
+      if (playerName === judgeName) {
+        navigate(`/judge/${roomCode}`, { state: { playerName } });
+      } else {
+        navigate(`/guess/${roomCode}`, { state: { playerName } });
+      }
+    }
+  });
+
+  return () => {
+    socket.off('playerJoined');
+    socket.off('gameStarted');
+    socket.off('newEntry');
+    socket.off('startRankingPhase');
+    socket.off('roomState');
+  };
+}, [playerName, navigate, roomCode]);
 
   useEffect(() => {
     if (players.length > 0 && gameStarted) {
