@@ -59,7 +59,13 @@ function RoomPage() {
   if (response.status === 200 || response.status === 201) {
     toast({ title: 'Room joined!', status: 'success' });
     setPhase('waiting');
-    socket.emit('joinGameRoom', { roomCode, playerName: safeName });
+    if (!socket.connected) {
+  toast({ title: 'Socket not ready yet.', status: 'error' });
+  return;
+}
+
+socket.emit('joinGameRoom', { roomCode, playerName: safeName });
+
   } else {
     toast({ title: 'Join failed', description: 'Unexpected status code.', status: 'error' });
   }
