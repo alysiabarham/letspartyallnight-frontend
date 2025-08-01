@@ -21,11 +21,20 @@ const socket = io('https://letspartyallnight-backend.onrender.com', {
   withCredentials: true
 });
 
+socket.on('connect', () => {
+  console.log('✅ Socket connected:', socket.id);
+});
+  
+const toast = useToast();
 function RoomPage() {
   const { roomCode } = useParams();
+
+if (!roomCode) {
+  toast({ title: 'Missing room code.', status: 'error' });
+  return null; // or navigate to homepage, or show fallback UI
+}
   const location = useLocation();
   const navigate = useNavigate();
-  const toast = useToast();
   const playerName = location.state?.playerName || 'Guest';
 
   const [players, setPlayers] = useState<string[]>([]);
@@ -65,6 +74,7 @@ function RoomPage() {
 }
 
 socket.emit('joinGameRoom', { roomCode, playerName: safeName });
+localStorage.setItem('alreadyJoined', roomCode);
 
   } else {
     toast({ title: 'Join failed', description: 'Unexpected status code.', status: 'error' });
@@ -94,6 +104,9 @@ socket.emit('joinGameRoom', { roomCode, playerName: safeName });
     localStorage.setItem('playerName', playerName);
 
   };
+
+const alreadyJoined = localStorage.getItem('alreadyJoined');
+if (alreadyJoined === roomCode) return;
 
   handleJoinRoom();
 
