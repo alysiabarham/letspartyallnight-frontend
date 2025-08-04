@@ -16,9 +16,8 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import { AxiosError } from 'axios';
 
-const socket = io('https://letspartyallnight-backend.onrender.com', {
-  transports: ['websocket'],
-  withCredentials: true
+const socket = io("https://letspartyallnight-backend.onrender.com", {
+  transports: ["websocket"], // 👈 Force WebSocket only
 });
 
 socket.on('connect', () => {
