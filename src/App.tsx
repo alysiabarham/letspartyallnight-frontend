@@ -1,9 +1,8 @@
 // src/App.tsx
 import { useState } from 'react';
-import { Box, Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/react';
+import { Button, Input, VStack, Heading, Text, useToast } from '@chakra-ui/react';
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import { useEffect } from 'react';
 
 import RoomPage from './RoomPage';
@@ -187,7 +186,6 @@ function App() {
       <Route path="/room/:roomCode" element={<RoomPage />} />
       <Route path="/judge/:roomCode" element={<JudgeRankingPage />} />
       <Route path="/guess/:roomCode" element={<GuesserRankingPage />} />
-      // eslint-disable-next-line react/jsx-no-undef
       <Route path="/results/:roomCode" element={<ResultsPage />} />
     </Routes>
   );

@@ -124,7 +124,7 @@ const [playerName] = useState(location.state?.playerName || localStorage.getItem
       socket.off('sendAllEntries');
       socket.off('revealResults');
     };
-  }, [roomCode, playerName]);
+}, [entries, playerName, roomCode, toast]);
 
 useEffect(() => {
   socket.on('playerJoined', ({ players }) => {
@@ -134,7 +134,7 @@ useEffect(() => {
       navigate(`/results/${roomCode}`);
     }
   });
-}, [playerName]);
+}, [playerName, navigate, roomCode]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -150,7 +150,7 @@ useEffect(() => {
     }, 5000);
 
     return () => clearTimeout(timeout);
-  }, [entries]);
+}, [entries, toast]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;

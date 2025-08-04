@@ -123,7 +123,7 @@ socket.emit('requestEntries', { roomCode });
   return () => {
     socket.off('sendAllEntries', handleSendAllEntries);
   };
-}, [roomCode]);
+}, [roomCode, playerName, toast]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;

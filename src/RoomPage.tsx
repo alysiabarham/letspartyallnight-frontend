@@ -24,17 +24,13 @@ const socket = io('https://letspartyallnight-backend.onrender.com', {
 socket.on('connect', () => {
   console.log('✅ Socket connected:', socket.id);
 });
-  
-const toast = useToast();
+
 function RoomPage() {
   const { roomCode } = useParams();
-
-if (!roomCode) {
-  toast({ title: 'Missing room code.', status: 'error' });
-  return null; // or navigate to homepage, or show fallback UI
-}
   const location = useLocation();
   const navigate = useNavigate();
+  const toast = useToast();
+
   const playerName = location.state?.playerName || 'Guest';
 
   const [players, setPlayers] = useState<string[]>([]);
@@ -47,10 +43,19 @@ if (!roomCode) {
   const [round, setRound] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
   const [phase, setPhase] = useState<'waiting' | 'entry' | 'ranking'>('waiting');
-  const [roundLimit, setRoundLimit] = useState(5); // ✅ NEW: controls total rounds
+  const [roundLimit, setRoundLimit] = useState(5);
 
   useEffect(() => {
-  const handleJoinRoom = async () => {
+  if (!roomCode) {
+    toast({ title: 'Missing room code.', status: 'error' });
+    navigate('/');
+    return;
+  }
+
+  const alreadyJoined = localStorage.getItem('alreadyJoined');
+  if (alreadyJoined === roomCode) return;
+
+    const handleJoinRoom = async () => {
     const safeName = playerName.trim().replace(/[^a-zA-Z0-9]/g, '');
     if (!safeName || safeName.length > 20) {
       toast({ title: 'Name must be alphanumeric & under 20 chars.', status: 'error' });
@@ -58,55 +63,42 @@ if (!roomCode) {
     }
 
     try {
-  const response = await axios.post('https://letspartyallnight-backend.onrender.com/join-room', {
-  roomCode,
-  playerId: safeName
-}, {
-  withCredentials: true
-});
-
-  if (response.status === 200 || response.status === 201) {
-    toast({ title: 'Room joined!', status: 'success' });
-    setPhase('waiting');
-    if (!socket.connected) {
-  toast({ title: 'Socket not ready yet.', status: 'error' });
-  return;
-}
-
-socket.emit('joinGameRoom', { roomCode, playerName: safeName });
-localStorage.setItem('alreadyJoined', roomCode);
-
-  } else {
-    toast({ title: 'Join failed', description: 'Unexpected status code.', status: 'error' });
-  }
-} catch (error: unknown) {
-  if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError;
-
-    if (axiosError.response?.status === 409) {
-      toast({ title: 'Name already taken.', status: 'error' });
-    } else {
-      toast({
-        title: 'Join failed',
-        description: axiosError.message,
-        status: 'error'
+      const response = await axios.post('https://letspartyallnight-backend.onrender.com/join-room', {
+        roomCode,
+        playerId: safeName
+      }, {
+        withCredentials: true
       });
+
+      if (response.status === 200 || response.status === 201) {
+        toast({ title: 'Room joined!', status: 'success' });
+        setPhase('waiting');
+
+        if (!socket.connected) {
+          toast({ title: 'Socket not ready yet.', status: 'error' });
+          return;
+        }
+
+        socket.emit('joinGameRoom', { roomCode, playerName: safeName });
+
+        localStorage.setItem('alreadyJoined', roomCode);
+        localStorage.setItem('playerName', playerName);
+      } else {
+        toast({ title: 'Join failed', description: 'Unexpected status code.', status: 'error' });
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 409) {
+          toast({ title: 'Name already taken.', status: 'error' });
+        } else {
+          toast({ title: 'Join failed', description: axiosError.message, status: 'error' });
+        }
+      } else {
+        toast({ title: 'Join failed', description: 'An unknown error occurred.', status: 'error' });
+      }
     }
-  } else {
-    toast({
-      title: 'Join failed',
-      description: 'An unknown error occurred.',
-      status: 'error'
-    });
-  }
-}
-
-    localStorage.setItem('playerName', playerName);
-
   };
-
-const alreadyJoined = localStorage.getItem('alreadyJoined');
-if (alreadyJoined === roomCode) return;
 
   handleJoinRoom();
 
@@ -116,8 +108,9 @@ if (alreadyJoined === roomCode) return;
     socket.off('newEntry');
     socket.off('startRankingPhase');
   };
-}, []);
-  useEffect(() => {
+}, [roomCode, playerName, toast, navigate]);
+
+useEffect(() => {
     if (players.length > 0 && !host) {
       setHost(players[0]);
     }
@@ -257,7 +250,7 @@ useEffect(() => {
     console.log("❓ No entries received, re-requesting...");
     socket.emit('requestEntries', { roomCode });
   }
-}, [entries]);
+}, [entries, roomCode]);
 
   const handleAdvanceToRankingPhase = () => {
     if (entries.length < 5) {
