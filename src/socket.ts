@@ -2,9 +2,12 @@
 import { io } from "socket.io-client";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-console.log("Backend URL:", backendUrl); // ✅ debug log
+
+if (!backendUrl) {
+  throw new Error("❌ VITE_BACKEND_URL is not defined. Check your Vercel env vars.");
+}
 
 export const socket = io(backendUrl, {
-  withCredentials: true,
   transports: ["websocket"],
+  autoConnect: true,
 });
