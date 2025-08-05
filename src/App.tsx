@@ -9,7 +9,7 @@ import RoomPage from './RoomPage';
 import JudgeRankingPage from './JudgeRankingPage';
 import GuesserRankingPage from './GuesserRankingPage';
 import ResultsPage from './ResultsPage';
-import socket from './socket';
+import { socket } from "./socket";
 
 const LandingPageContent = () => {
   const [roomCodeInput, setRoomCodeInput] = useState('');

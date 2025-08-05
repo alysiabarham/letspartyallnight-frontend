@@ -26,7 +26,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import socket from './socket'; // ✅ shared instance
+import { socket } from "./socket";
 import { useLocation } from 'react-router-dom';
 
 const SortableItem = ({ id, index }: { id: string; index: number }) => {
