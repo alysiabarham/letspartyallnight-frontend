@@ -17,6 +17,7 @@ import JudgeRankingPage from "./JudgeRankingPage";
 import GuesserRankingPage from "./GuesserRankingPage";
 import ResultsPage from "./ResultsPage";
 import { socket } from "./socket";
+console.log("🧪 VITE_BACKEND_URL from App.tsx:", import.meta.env.VITE_BACKEND_URL);
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
