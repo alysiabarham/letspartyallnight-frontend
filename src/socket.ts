@@ -1,9 +1,10 @@
 // src/socket.ts
 import { io } from "socket.io-client";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+console.log("Backend URL:", backendUrl); // ✅ debug log
 
-export const socket = io(BACKEND_URL, {
+export const socket = io(backendUrl, {
   withCredentials: true,
   transports: ["websocket"],
 });
