@@ -1,9 +1,9 @@
 // src/socket.ts
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-const BACKEND_URL = process.env.REACT_APP_SOCKET_URL!;
-const socket = io(BACKEND_URL, {
-  withCredentials: true
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+export const socket = io(BACKEND_URL, {
+  withCredentials: true,
+  transports: ["websocket"], // optional: skip polling
 });
-
-export default socket;

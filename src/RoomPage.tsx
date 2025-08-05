@@ -12,13 +12,9 @@ import {
   ListItem,
   useToast
 } from '@chakra-ui/react';
-import { io } from 'socket.io-client';
 import axios from 'axios';
 import { AxiosError } from 'axios';
-
-const socket = io("https://letspartyallnight-backend.onrender.com", {
-  transports: ["websocket"], // 👈 Force WebSocket only
-});
+import { socket } from "./socket";
 
 socket.on('connect', () => {
   console.log('✅ Socket connected:', socket.id);
