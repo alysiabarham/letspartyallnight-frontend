@@ -5,5 +5,5 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const socket = io(BACKEND_URL, {
   withCredentials: true,
-  transports: ["websocket"], // optional: skip polling
+  transports: ["websocket"],
 });
