@@ -1,14 +1,13 @@
 // src/socket.ts
 import { io } from "socket.io-client";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://letspartyallnight-backend.onrender.com";
-console.log("🧪 VITE_BACKEND_URL at runtime:", import.meta.env.VITE_BACKEND_URL);
+const getBackendUrl = () => {
+  const url = import.meta.env.VITE_BACKEND_URL;
+  console.log("🧪 VITE_BACKEND_URL at runtime:", url);
+  return url || "https://letspartyallnight-backend.onrender.com";
+};
 
-if (!backendUrl) {
-  throw new Error("❌ VITE_BACKEND_URL is not defined. Check Vercel env vars.");
-}
-
-export const socket = io(backendUrl, {
+export const socket = io(getBackendUrl(), {
   transports: ["websocket"],
   autoConnect: true,
 });
