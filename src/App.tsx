@@ -1,6 +1,11 @@
 // src/App.tsx
 import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import {
   Button,
   Input,
@@ -8,6 +13,8 @@ import {
   Heading,
   Text,
   useToast,
+  ChakraProvider,
+  Box,
 } from "@chakra-ui/react";
 import axios from "axios";
 import "./App.css";
@@ -17,7 +24,6 @@ import JudgeRankingPage from "./JudgeRankingPage";
 import GuesserRankingPage from "./GuesserRankingPage";
 import ResultsPage from "./ResultsPage";
 import { socket } from "./socket";
-console.log("🧪 VITE_BACKEND_URL from App.tsx:", import.meta.env.VITE_BACKEND_URL);
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -43,17 +49,6 @@ function LandingPageContent() {
         title: "Enter your name.",
         status: "warning",
         duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9]+$/.test(playerNameInput.trim())) {
-      toast({
-        title: "Invalid Name",
-        description: "Use only letters and numbers.",
-        status: "error",
-        duration: 5000,
         isClosable: true,
       });
       return;
@@ -98,28 +93,6 @@ function LandingPageContent() {
       return;
     }
 
-    if (!/^[a-zA-Z0-9]+$/.test(playerNameInput.trim())) {
-      toast({
-        title: "Invalid Name",
-        description: "Use only letters and numbers.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9]+$/.test(roomCodeInput.trim())) {
-      toast({
-        title: "Invalid Code",
-        description: "Code must be alphanumeric.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
     try {
       const playerId = playerNameInput.trim();
       const response = await axios.post(`${backendUrl}/join-room`, {
@@ -152,11 +125,6 @@ function LandingPageContent() {
       });
     }
   };
-
-  if (!socket) {
-    console.log("Socket not initialized");
-    return <div>Loading...</div>;
-  }
 
   return (
     <VStack spacing={8} p={8} minH="100vh" justifyContent="center" bg="#1A1A2E">
@@ -256,13 +224,18 @@ function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<LandingPageContent />} />
-      <Route path="/room/:roomCode" element={<RoomPage />} />
-      <Route path="/judge/:roomCode" element={<JudgeRankingPage />} />
-      <Route path="/guess/:roomCode" element={<GuesserRankingPage />} />
-      <Route path="/results/:roomCode" element={<ResultsPage />} />
-    </Routes>
+    <ChakraProvider>
+      <Box minH="100vh">
+        <Routes>
+          <Route path="/" element={<LandingPageContent />} />
+          <Route path="/room/:roomCode" element={<RoomPage />} />
+          <Route path="/judge/:roomCode" element={<JudgeRankingPage />} />
+          <Route path="/guess/:roomCode" element={<GuesserRankingPage />} />
+          <Route path="/results/:roomCode" element={<ResultsPage />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Box>
+    </ChakraProvider>
   );
 }
 
